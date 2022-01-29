@@ -40,8 +40,6 @@ router.afterEach((to) => {
       ad.classList.remove("ad-hide");
     }
   });
-
-  console.log(ads);
 });
 
 export default router;
