@@ -38,66 +38,30 @@
     </noscript>
 
     <script type="text/javascript">
-      (function(g, a, m, e, A, d, s) {
-        g[A] =
-          g[A] ||
-          function() {
-            (g[A].s = g[A].s || []).push(arguments);
-          };
-        g[A].l = 1 * new Date();
-        (d = a.createElement("script")),
-          (s = a.getElementsByTagName("script")[0]),
-          (d.async = 1),
-          (d.src =
-            e +
-            "?objid=" +
-            m +
-            "&jsdate=" +
-            +new Date() +
-            "&lang=" +
-            g.navigator.language +
-            "&rfunc=" +
-            A +
-            "&fromhost=" +
-            g.location.hostname +
-            "&refr=" +
-            encodeURIComponent(a.referrer) +
-            "&fromurl=" +
-            encodeURIComponent(g.location.href) +
-            ""),
-          s.parentNode.insertBefore(d, s);
-      })(window, document, "gameadsbanner", "https://n.gameads.io/getcode", "GameAdsRenew");
-    </script>
-
-    <div class="ad ad-home ad-home-left">
-      <script type="text/javascript">
-        atOptions = {
-          key: "1460bb61e88e80b42f5ba58cf71ce7df",
-          format: "iframe",
-          height: 600,
-          width: 160,
-          params: {},
-        };
-        document.write(
-          "<scr" +
-            'ipt type="text/javascript" src="http' +
-            (location.protocol === "https:" ? "s" : "") +
-            '://www.effectivedisplaycontent.com/1460bb61e88e80b42f5ba58cf71ce7df/invoke.js"></scr' +
-            "ipt>"
-        );
-      </script>
-    </div>
-
-    <script>
-      function gameadsClicked() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://api.countapi.xyz/hit/scuffeduno.online/gameadsclicks");
-        xhr.responseType = "json";
-        xhr.onload = function() {};
-        xhr.send();
-      }
-
-      window.gameadsClicked = gameadsClicked;
+      window.SDK_OPTIONS = {
+        gameId: "d4lg1jqo79hb03td83ba97meh6s7fpt6",
+        onEvent: function(a) {
+          switch (a.name) {
+            case "SDK_GAME_PAUSE":
+              // pause game logic / mute audio
+              break;
+            case "SDK_GAME_START":
+              // advertisement done, resume game logic and unmute audio
+              break;
+            case "SDK_READY":
+              // when sdk is ready
+              break;
+          }
+        },
+      };
+      (function(a, b, c) {
+        var d = a.getElementsByTagName(b)[0];
+        a.getElementById(c) ||
+          ((a = a.createElement(b)),
+          (a.id = c),
+          (a.src = "https://api.gamemonetize.com/sdk.js"),
+          d.parentNode.insertBefore(a, d));
+      })(document, "script", "gamemonetize-sdk");
     </script>
 
     <div id="app"></div>

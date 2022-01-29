@@ -261,10 +261,15 @@ export default {
         this.animateOtherPlayCard(other, room.wildcard, true);
       }
 
-      if (room.winner && window.innerHeight >= 650) {
+      if (room.winner) {
         setTimeout(() => {
-          window.GameAdsRenew("gameadsbanner");
-        }, 600);
+          if (
+            typeof sdk !== "undefined" &&
+            window.sdk.showBanner !== "undefined"
+          ) {
+            window.sdk.showBanner();
+          }
+        }, 2000);
       }
     },
   },

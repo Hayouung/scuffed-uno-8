@@ -251,15 +251,9 @@ export default {
       this.fetchingPublicRooms = false;
     });
 
-    if (window.innerWidth >= 900) {
-      window.GameAdsRenew("gameadsbanner");
+    if (typeof sdk !== "undefined" && window.sdk.showBanner !== "undefined") {
+      window.sdk.showBanner();
     }
-
-    this.gameAdsInterval = setInterval(() => {
-      if (window.innerWidth >= 900) {
-        window.GameAdsRenew("gameadsbanner");
-      }
-    }, 17000);
   },
   destroyed() {
     clearInterval(this.gameAdsInterval);
@@ -326,14 +320,6 @@ export default {
     <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
     </div>
-
-    <a
-      class="watermark stats-link"
-      style="bottom: 5.5vh"
-      href="https://kevin.games"
-    >
-      More Games
-    </a>
 
     <router-link class="watermark stats-link" to="/stats">
       Global Stats
