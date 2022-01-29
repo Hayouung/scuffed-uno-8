@@ -208,7 +208,7 @@ export default {
       this.options[this.currentLevel + "Back"]();
     },
     copyJoinRoomLink() {
-      const link = `${window.location.origin}/?room=${this.room.id}`;
+      const link = `${window.location.origin}/?room=${encodeURI(this.room.id)}`;
       window.navigator.clipboard
         .writeText(link)
         .then(() => alert("Copied!"))
