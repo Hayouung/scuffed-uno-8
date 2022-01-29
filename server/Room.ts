@@ -160,6 +160,7 @@ export class Room implements RoomInterface {
       // if there is still no cards then just generate another deck
       if (this.deck.cards.length === 0) {
         this.deck.generateDeck(false);
+        this.deck.shuffleDeck();
       }
     }
 
