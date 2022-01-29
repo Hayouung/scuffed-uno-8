@@ -299,21 +299,23 @@ body {
     }
   }
 
-  &.ad-home-left {
-    transform: translateY(-50%) scale(0.9);
-    transform-origin: center;
-    top: 52%;
-    left: 1vh;
-    height: 600px;
-    width: 160px;
-    z-index: 1;
+  &.ad-home {
+    &-left {
+      transform: translateY(-50%) scale(0.9);
+      transform-origin: center;
+      top: 52%;
+      left: 1vh;
+      height: 600px;
+      width: 160px;
+      z-index: 1;
 
-    @media screen and (max-height: 725px) {
-      display: none;
-    }
+      @media screen and (max-height: 725px) {
+        display: none;
+      }
 
-    @media screen and (max-width: 730px) {
-      display: none;
+      @media screen and (max-width: 730px) {
+        display: none;
+      }
     }
   }
 }

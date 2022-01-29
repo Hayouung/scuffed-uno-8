@@ -29,4 +29,19 @@ const router = new VueRouter({
   routes,
 });
 
+router.afterEach((to) => {
+  const c = to.name === "Home" ? "ad-home" : "ad-game";
+  const ads = document.getElementsByClassName("ad");
+
+  Array.from(ads).forEach((ad) => {
+    if (!ad.classList.contains(c)) {
+      ad.style.display = "none";
+    } else {
+      ad.style.display = "block";
+    }
+  });
+
+  console.log(ads);
+});
+
 export default router;
