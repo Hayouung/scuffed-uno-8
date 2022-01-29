@@ -318,5 +318,9 @@ body {
       }
     }
   }
+
+  &.ad-hide {
+    display: none;
+  }
 }
 </style>

@@ -35,9 +35,9 @@ router.afterEach((to) => {
 
   Array.from(ads).forEach((ad) => {
     if (!ad.classList.contains(c)) {
-      ad.style.display = "none";
+      ad.classList.add("ad-hide");
     } else {
-      ad.style.display = "block";
+      ad.classList.remove("ad-hide");
     }
   });
 
