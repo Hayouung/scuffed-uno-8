@@ -6,12 +6,20 @@ import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
+import Advert from "../components/Advert.vue";
 
 let observer;
 
 export default {
   name: "Home",
-  components: { UMenuCard, UMenuModal, UMenuInput, UMenuBtn, USettingsMenu },
+  components: {
+    UMenuCard,
+    UMenuModal,
+    UMenuInput,
+    UMenuBtn,
+    USettingsMenu,
+    Advert,
+  },
   mixins: [menuOptions],
   data() {
     return {
@@ -323,6 +331,13 @@ export default {
       :style="{ background: isDev ? 'white' : '' }"
     ></Adsense> -->
 
+    <advert
+      adKey="1460bb61e88e80b42f5ba58cf71ce7df"
+      :width="160"
+      :height="600"
+      class="ad-left ad-home-left"
+    />
+
     <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
     </div>
@@ -610,6 +625,12 @@ $mobile: 900px;
   align-items: center;
 
   @media screen and (max-width: $mobile) {
+    display: none;
+  }
+}
+
+.ad-home-left {
+  @media screen and (max-height: 725px) {
     display: none;
   }
 }

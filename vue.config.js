@@ -2,6 +2,8 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
+  publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
+
   chainWebpack: (config) => {
     config.plugin("html").tap((args) => {
       args[0].title = "Scuffed Uno - Play UNO online with friends";

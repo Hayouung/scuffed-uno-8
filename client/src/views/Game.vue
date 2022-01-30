@@ -7,6 +7,7 @@ import UGameColorPicker from "@/components/Game/UGameColorPicker.vue";
 import UGamePlayerCards from "@/components/Game/UGamePlayerCards.vue";
 import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
+import Advert from "../components/Advert.vue";
 
 export default {
   name: "Game",
@@ -19,6 +20,7 @@ export default {
     UGamePlayerCards,
     UMenuBtn,
     USettingsMenu,
+    Advert,
   },
   data() {
     return {
@@ -525,6 +527,41 @@ export default {
       <div id="gameadsbanner"></div>
     </div>
 
+    <advert
+      v-if="room.winner"
+      adKey="ebd29f80f6199b9bd3098b513c41758f"
+      :width="728"
+      :height="90"
+      class="ad-top ad-top-win"
+    />
+
+    <advert
+      v-if="room.winner"
+      adKey="5bd0055c6997223ceecc4982f220e09a"
+      :width="468"
+      :height="60"
+      :timeout="600"
+      class="ad-top ad-top2-win"
+    />
+
+    <advert
+      v-if="room.winner"
+      adKey="7444f768fa3f77c27c1f763f4aaec25d"
+      :width="160"
+      :height="300"
+      :timeout="1200"
+      class="ad-left ad-left-win"
+    />
+
+    <advert
+      v-if="room.winner"
+      adKey="79c2e6109b0f3a2382b5206ed87f508b"
+      :width="250"
+      :height="300"
+      :timeout="1800"
+      class="ad-right ad-right-win"
+    />
+
     <u-menu-modal
       v-if="room.winner"
       :title="`Congratulations to ${room.winner.username} on winning the game!`"
@@ -680,6 +717,40 @@ $table-rotatex: 58deg;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  .ad-top-win {
+    top: 8vh;
+    z-index: 10000;
+
+    @media screen and (max-height: 560px) {
+      display: none;
+    }
+  }
+
+  .ad-top2-win {
+    top: calc(8vh + 125px);
+    z-index: 10000;
+
+    @media screen and (max-height: 765px) {
+      display: none;
+    }
+  }
+
+  .ad-left-win {
+    z-index: 10000;
+
+    @media screen and (max-width: 1180px) {
+      display: none;
+    }
+  }
+
+  .ad-right-win {
+    z-index: 10000;
+
+    @media screen and (max-width: 1420px) {
+      display: none;
+    }
+  }
 }
 
 .animation-cards {

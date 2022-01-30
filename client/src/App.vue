@@ -277,18 +277,38 @@ body {
   position: absolute;
   display: block;
 
+  &::before {
+    content: "Advertisement";
+    position: absolute;
+    top: -1.5rem;
+    width: 100%;
+    text-align: center;
+    color: white;
+    opacity: 0.7;
+    font-size: 0.9rem;
+  }
+
+  &.ad-top {
+    transform: translate(-50%);
+    transform-origin: bottom center;
+    left: 50%;
+    top: 1vh;
+
+    @media screen and (max-width: 740px) {
+      display: none;
+    }
+
+    &::before {
+      top: unset;
+      bottom: -1.5rem;
+    }
+  }
+
   &.ad-bottom {
     transform: translate(-50%);
     transform-origin: bottom center;
-    left: 47.5%;
+    left: 50%;
     bottom: 1vh;
-    width: 60vw;
-
-    .ins {
-      height: 15vh !important;
-      min-height: 60px;
-      max-height: 300px;
-    }
 
     @media screen and (max-width: 650px) {
       width: 52vw;
@@ -299,23 +319,27 @@ body {
     }
   }
 
-  &.ad-home {
-    &-left {
-      transform: translateY(-50%) scale(0.9);
-      transform-origin: center;
-      top: 52%;
-      left: 1vh;
-      height: 600px;
-      width: 160px;
-      z-index: 1;
+  &.ad-left {
+    transform: translateY(-50%) scale(0.9);
+    transform-origin: center;
+    top: 50%;
+    left: 1vh;
+    z-index: 1;
 
-      @media screen and (max-height: 725px) {
-        display: none;
-      }
+    @media screen and (max-width: 730px) {
+      display: none;
+    }
+  }
 
-      @media screen and (max-width: 730px) {
-        display: none;
-      }
+  &.ad-right {
+    transform: translateY(-50%) scale(0.9);
+    transform-origin: center;
+    top: 50%;
+    right: 1vh;
+    z-index: 1;
+
+    @media screen and (max-width: 730px) {
+      display: none;
     }
   }
 
