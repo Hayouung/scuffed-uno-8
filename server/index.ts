@@ -13,8 +13,8 @@ const io = new Server(http, {
         ? [
             "https://scuffeduno.online",
             "https://scuffeduno.netlify.app",
-            "https://uncached.gamemonetize.com",
-            "https://html5.gamemonetize.com",
+            "https://uncached.gamemonetize.co",
+            "https://html5.gamemonetize.co",
           ]
         : "*",
     methods: ["GET", "POST"],
