@@ -317,9 +317,9 @@ export default {
       :style="{ background: isDev ? 'white' : '' }"
     ></Adsense> -->
 
-    <div class="gameads-container" @click="gameadsClicked()">
+    <!-- <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
-    </div>
+    </div> -->
 
     <router-link class="watermark stats-link" to="/stats">
       Global Stats
@@ -362,14 +362,9 @@ export default {
         <a
           class="code"
           style="opacity: 0.7; transform: scale(0.9)"
-          href="https://www.crazygames.com/game/scuffed-uno"
-          >Play on
-          <span style="text-decoration: underline">crazygames.com</span></a
-        >
-        <a
-          class="code"
-          style="opacity: 0.7; transform: scale(0.9)"
           href="https://scuffeduno.online"
+          target="_blank"
+          rel="noopener"
           >Play on
           <span style="text-decoration: underline">scuffeduno.online</span></a
         >

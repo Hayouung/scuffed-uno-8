@@ -517,13 +517,13 @@ export default {
 
 <template>
   <div class="game">
-    <div
+    <!-- <div
       v-if="room.winner"
       class="gameads-container-win"
       @click="gameadsClicked"
     >
       <div id="gameadsbanner"></div>
-    </div>
+    </div> -->
 
     <u-menu-modal
       v-if="room.winner"
