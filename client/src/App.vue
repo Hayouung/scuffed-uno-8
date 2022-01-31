@@ -98,6 +98,22 @@ export default {
       this.$store.commit("SET_SOUND_CONTROLLER", new SoundController());
     },
   },
+  mounted() {
+    let volume = 0;
+
+    window.gameMonetizePause = () => {
+      if (this.$store.state.soundController) {
+        volume = this.$store.state.soundController.musicVolume;
+        this.$store.state.soundController.setMusicVolume(0);
+      }
+    };
+
+    window.gameMonetizeStart = () => {
+      if (this.$store.state.soundController) {
+        this.$store.state.soundController.setMusicVolume(volume);
+      }
+    };
+  },
 };
 </script>
 

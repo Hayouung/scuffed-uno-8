@@ -1,8 +1,8 @@
 const musicPlayer = new Audio();
 const effectPlayer = new Audio();
 
-const tracksDir = "/sound/tracks";
-const effectsDir = "/sound/effects";
+const tracksDir = "./sound/tracks";
+const effectsDir = "./sound/effects";
 
 const loadAudio = (path) => {
   const audio = document.createElement("audio");

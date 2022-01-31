@@ -263,12 +263,7 @@ export default {
 
       if (room.winner) {
         setTimeout(() => {
-          if (
-            typeof sdk !== "undefined" &&
-            window.sdk.showBanner !== "undefined"
-          ) {
-            window.sdk.showBanner();
-          }
+          window.showAd();
         }, 2000);
       }
     },
