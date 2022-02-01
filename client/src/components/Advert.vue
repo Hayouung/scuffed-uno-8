@@ -22,30 +22,25 @@ export default {
     },
   },
   mounted() {
-    const ad = this.$refs.ad;
-    if (!ad) return;
-
-    const atOptions = {
-      key: this.adKey,
-      format: "iframe",
-      height: this.height,
-      width: this.width,
-      params: {},
-    };
-
-    const conf = document.createElement("script");
-    conf.innerHTML = `atOptions = ${JSON.stringify(atOptions)}`;
-
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = `//www.effectivedisplaycontent.com/${atOptions.key}/invoke.js`;
-
-    setTimeout(() => {
-      if (!ad) return;
-
-      ad.appendChild(conf);
-      ad.appendChild(script);
-    }, this.timeout);
+    // const ad = this.$refs.ad;
+    // if (!ad) return;
+    // const atOptions = {
+    //   key: this.adKey,
+    //   format: "iframe",
+    //   height: this.height,
+    //   width: this.width,
+    //   params: {},
+    // };
+    // const conf = document.createElement("script");
+    // conf.innerHTML = `atOptions = ${JSON.stringify(atOptions)}`;
+    // const script = document.createElement("script");
+    // script.type = "text/javascript";
+    // script.src = `//www.effectivedisplaycontent.com/${atOptions.key}/invoke.js`;
+    // setTimeout(() => {
+    //   if (!ad) return;
+    //   ad.appendChild(conf);
+    //   ad.appendChild(script);
+    // }, this.timeout);
   },
 };
 </script>
