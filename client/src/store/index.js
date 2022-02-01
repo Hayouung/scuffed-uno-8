@@ -45,6 +45,7 @@ const store = new Vuex.Store({
     room: { ...defaultRoom },
     soundController: null,
     kicked: false,
+    showAdApology: true,
   },
   mutations: {
     SET_WINDOW_DIMENSIONS(state, { width, height }) {

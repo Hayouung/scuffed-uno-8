@@ -278,7 +278,7 @@ body {
   display: block;
 
   &::before {
-    content: "Advertisement";
+    // content: "Advertisement";
     position: absolute;
     top: -1.5rem;
     width: 100%;
