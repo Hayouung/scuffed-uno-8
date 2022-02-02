@@ -307,6 +307,7 @@ export default {
       Help improve Scuffed Uno!
     </a>
 
+    <!-- 
     <u-menu-modal
       style="font-size: 1.2rem"
       v-if="$store.state.showAdApology"
@@ -315,7 +316,7 @@ export default {
       I am extremely sorry for the redirect ads, they were not intended. It
       seems as tho the ad network I was using had been infected with malware
       scam ads, Pog. These ads have now been removed.
-    </u-menu-modal>
+    </u-menu-modal> -->
 
     <!-- <Adsense
       class="ad ad-side"
