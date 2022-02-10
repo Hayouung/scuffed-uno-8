@@ -30,6 +30,7 @@ const defaultRoom = {
   left: {},
   top: {},
   winner: {},
+  adClient: "ca-pub-2444394876892971",
 };
 
 const store = new Vuex.Store({

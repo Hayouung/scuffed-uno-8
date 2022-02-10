@@ -3,8 +3,13 @@
 export default {
   name: "Advert",
   components: {},
+  data() {
+    return {
+      adtest: "",
+    };
+  },
   props: {
-    adKey: {
+    adSlot: {
       type: String,
       require: true,
     },
@@ -22,31 +27,45 @@ export default {
     },
   },
   mounted() {
-    // const ad = this.$refs.ad;
-    // if (!ad) return;
-    // const atOptions = {
-    //   key: this.adKey,
-    //   format: "iframe",
-    //   height: this.height,
-    //   width: this.width,
-    //   params: {},
-    // };
-    // const conf = document.createElement("script");
-    // conf.innerHTML = `atOptions = ${JSON.stringify(atOptions)}`;
-    // const script = document.createElement("script");
-    // script.type = "text/javascript";
-    // script.src = `//www.effectivedisplaycontent.com/${atOptions.key}/invoke.js`;
-    // setTimeout(() => {
-    //   if (!ad) return;
-    //   ad.appendChild(conf);
-    //   ad.appendChild(script);
-    // }, this.timeout);
+    const ad = this.$refs.ad;
+    if (!ad) return;
+
+    const conf = document.createElement("script");
+    conf.innerHTML = `(adsbygoogle = window.adsbygoogle || []).push({});`;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${this.$store.state.adClient}`;
+
+    if (window.location.hostname === "localhost") {
+      this.adtest = "on";
+    }
+
+    setTimeout(() => {
+      if (!ad) return;
+      ad.appendChild(conf);
+      ad.appendChild(script);
+    }, this.timeout);
   },
 };
 </script>
 
 <template>
-  <div class="ad" ref="ad"></div>
+  <div class="ad" ref="ad">
+    <ins
+      class="adsbygoogle"
+      :style="{
+        display: `inline-block`,
+        width: `${width}px`,
+        height: `${height}px`,
+        background: adtest ? `white` : ``,
+      }"
+      :data-ad-client="$store.state.adClient"
+      :data-ad-slot="adSlot"
+      :data-adtest="adtest"
+    ></ins>
+  </div>
 </template>
 
 <style lang="scss" scoped>

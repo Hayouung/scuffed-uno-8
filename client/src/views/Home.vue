@@ -6,7 +6,7 @@ import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
-import Advert from "../components/Advert.vue";
+// import Advert from "../components/Advert.vue";
 
 let observer;
 
@@ -18,7 +18,7 @@ export default {
     UMenuInput,
     UMenuBtn,
     USettingsMenu,
-    Advert,
+    // Advert,
   },
   mixins: [menuOptions],
   data() {
@@ -342,12 +342,12 @@ export default {
       :style="{ background: isDev ? 'white' : '' }"
     ></Adsense> -->
 
-    <advert
+    <!-- <advert
       adKey="1460bb61e88e80b42f5ba58cf71ce7df"
       :width="160"
       :height="600"
       class="ad-left ad-home-left"
-    />
+    /> -->
 
     <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>

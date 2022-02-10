@@ -528,37 +528,43 @@ export default {
     </div>
 
     <advert
+      v-if="!room.winner"
+      adSlot="8062339187"
+      :width="468"
+      :height="60"
+      class="ad-top ad-top-game"
+    />
+
+    <advert
       v-if="room.winner"
-      adKey="ebd29f80f6199b9bd3098b513c41758f"
-      :width="728"
+      adSlot="8062339187"
+      :width="970"
       :height="90"
       class="ad-top ad-top-win"
     />
 
-    <advert
+    <!-- <advert
       v-if="room.winner"
       adKey="5bd0055c6997223ceecc4982f220e09a"
       :width="468"
       :height="60"
       :timeout="600"
       class="ad-top ad-top2-win"
-    />
+    /> -->
 
     <advert
       v-if="room.winner"
-      adKey="7444f768fa3f77c27c1f763f4aaec25d"
+      adSlot="6389670028"
       :width="160"
-      :height="300"
-      :timeout="1200"
+      :height="600"
       class="ad-left ad-left-win"
     />
 
     <advert
       v-if="room.winner"
-      adKey="79c2e6109b0f3a2382b5206ed87f508b"
-      :width="250"
-      :height="300"
-      :timeout="1800"
+      adSlot="6453249207"
+      :width="300"
+      :height="600"
       class="ad-right ad-right-win"
     />
 
@@ -717,6 +723,17 @@ $table-rotatex: 58deg;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  .ad-top-game {
+    left: 1vh;
+    right: unset;
+    transform: translateX(0);
+    z-index: 100;
+
+    @media screen and (max-width: 1350px) {
+      display: none;
+    }
+  }
 
   .ad-top-win {
     top: 8vh;
