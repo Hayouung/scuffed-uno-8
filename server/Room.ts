@@ -88,6 +88,13 @@ export class Room implements RoomInterface {
       // create replacement bot
       const bot = this.createBot(player);
       this.addBot(bot, player);
+
+      if (this.turn === player) {
+        this.turn = bot;
+        this.turn.canPlay = true;
+        this.turn.canDraw = true;
+        this.turn.botPlay(this);
+      }
     } else {
       this.players = this.players.filter((p) => p.id !== player.id);
     }
@@ -99,10 +106,14 @@ export class Room implements RoomInterface {
     player.cards = [];
 
     // if only 1 player is left and remove is not replaced then kick last player as game cannot be played
-    if (players.length === 1 && !replace && this.started) {
+    if (this.players.length === 1 && !replace && this.started) {
       this.removePlayer(this.host, false);
       this.host.socket?.emit("kicked");
       console.log("kicked");
+    }
+
+    if (this.turn === player) {
+      this.nextTurn();
     }
   }
 
