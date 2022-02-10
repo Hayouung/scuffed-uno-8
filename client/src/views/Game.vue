@@ -529,7 +529,7 @@ export default {
 
     <advert
       v-if="!room.winner"
-      adSlot="8062339187"
+      adSlot="8788085732"
       :width="468"
       :height="60"
       class="ad-top ad-top-game"
@@ -730,7 +730,7 @@ $table-rotatex: 58deg;
     transform: translateX(0);
     z-index: 100;
 
-    @media screen and (max-width: 1350px) {
+    @media screen and (max-width: 900px) {
       display: none;
     }
   }

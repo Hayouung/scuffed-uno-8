@@ -30,7 +30,6 @@ const defaultRoom = {
   left: {},
   top: {},
   winner: {},
-  adClient: "ca-pub-2444394876892971",
 };
 
 const store = new Vuex.Store({
@@ -47,6 +46,7 @@ const store = new Vuex.Store({
     soundController: null,
     kicked: false,
     showAdApology: true,
+    adClient: "ca-pub-2444394876892971",
   },
   mutations: {
     SET_WINDOW_DIMENSIONS(state, { width, height }) {
