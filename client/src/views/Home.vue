@@ -6,6 +6,7 @@ import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
+import Chat from "../components/Chat.vue";
 // import Advert from "../components/Advert.vue";
 
 let observer;
@@ -18,6 +19,7 @@ export default {
     UMenuInput,
     UMenuBtn,
     USettingsMenu,
+    Chat,
     // Advert,
   },
   mixins: [menuOptions],
@@ -415,6 +417,8 @@ export default {
         >
       </div>
     </header>
+
+    <chat v-if="currentLevel === 'onlineRoom'" />
 
     <u-menu-modal
       v-if="showCreateRoomSoloModal"

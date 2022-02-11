@@ -13,6 +13,13 @@ export interface Settings {
   maxPlayers: number;
 }
 
+export interface ChatMessage {
+  text: string;
+  username: string;
+  id: string;
+  time: number;
+}
+
 interface RoomInterface {
   id: string;
   started: boolean;
@@ -29,6 +36,7 @@ interface RoomInterface {
   inactivityTimerInterval: NodeJS.Timeout | null;
   wildcard: Card | null;
   settings: Settings;
+  chat: ChatMessage[];
 
   addPlayer(player: Player): void;
   removePlayer(player: Player): void;
@@ -55,6 +63,7 @@ export class Room implements RoomInterface {
   inactivityTimerInterval: NodeJS.Timeout | null = null;
   wildcard: Card | null = null;
   settings: Settings;
+  chat: ChatMessage[] = [];
 
   constructor(host: Player, settings: Settings, id: string = "") {
     this.id = id || uuid().substr(0, 7);
@@ -106,7 +115,7 @@ export class Room implements RoomInterface {
     player.cards = [];
 
     // if only 1 player is left and remove is not replaced then kick last player as game cannot be played
-    if (this.players.length === 1 && !replace && this.started) {
+    if (this.players.length === 1 && !replace && this.started && this.host !== player) {
       this.removePlayer(this.host, false);
       this.host.socket?.emit("kicked");
       console.log("kicked");
@@ -427,6 +436,7 @@ export class Room implements RoomInterface {
         playerCount: this.players.length,
         maxPlayers: this.settings.maxPlayers,
         wildcard: this.wildcard,
+        chat: this.chat,
         you: {
           ...player,
           count: player.cards.length,

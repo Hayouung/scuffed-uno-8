@@ -30,6 +30,7 @@ const defaultRoom = {
   left: {},
   top: {},
   winner: {},
+  chat: [],
 };
 
 const store = new Vuex.Store({
@@ -45,7 +46,7 @@ const store = new Vuex.Store({
     room: { ...defaultRoom },
     soundController: null,
     kicked: false,
-    showAdApology: true,
+    showAdApology: false,
     adClient: "ca-pub-2444394876892971",
   },
   mutations: {

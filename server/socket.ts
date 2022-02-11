@@ -1,8 +1,12 @@
 import { Socket } from "socket.io";
 import { Card, CardColor, CardType } from "./Card";
 import Player from "./Player";
-import { Room, Settings } from "./Room";
+import { ChatMessage, Room, Settings } from "./Room";
 import { decrementStat, incrementPickedColors, incrementStat } from "./Stats";
+import { RateLimiter } from "limiter";
+
+import Filter from "bad-words";
+const filter = new Filter();
 
 const players: { [index: string]: Player } = {};
 const rooms: { [index: string]: Room } = {};
@@ -255,6 +259,27 @@ export default function(socket: Socket) {
     if (!room.started || room.turn.id !== player.id || !player.cards) return;
 
     room.nextTurn();
+  });
+
+  const messageLimiter = new RateLimiter({ tokensPerInterval: 30, interval: "minute" });
+
+  socket.on("room-send-message", async (m: ChatMessage) => {
+    if (!player.inRoom || m.id !== player.id) return;
+    if (m.text.length === 0 || m.text.length > 300) return;
+    if (m.username.length < 2 || m.username.length > 11) return;
+    if (m.time < 0 || m.time > Date.now() + 60000) return;
+
+    try {
+      const remainingMessages = await messageLimiter.removeTokens(1);
+    } catch {
+      return;
+    }
+
+    m.text = filter.clean(m.text);
+
+    const room = rooms[player.roomId];
+    room.chat.push(m);
+    room.broadcastState();
   });
 
   socket.on("get-public-rooms", () => {

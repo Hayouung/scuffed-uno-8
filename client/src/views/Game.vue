@@ -8,6 +8,7 @@ import UGamePlayerCards from "@/components/Game/UGamePlayerCards.vue";
 import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 import Advert from "../components/Advert.vue";
+import Chat from "../components/Chat.vue";
 
 export default {
   name: "Game",
@@ -21,6 +22,7 @@ export default {
     UMenuBtn,
     USettingsMenu,
     Advert,
+    Chat,
   },
   data() {
     return {
@@ -526,6 +528,8 @@ export default {
     >
       <div id="gameadsbanner"></div>
     </div>
+
+    <chat />
 
     <advert
       v-if="!room.winner"
