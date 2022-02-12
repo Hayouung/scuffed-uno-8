@@ -5,7 +5,20 @@ export default {
     return {
       isOpen: false,
       message: "",
+      msgSinceOpen: 0,
     };
+  },
+  computed: {
+    room() {
+      return this.$store.state.room;
+    },
+  },
+  watch: {
+    room(room, oldRoom) {
+      if (!this.isOpen && room.chat.length > oldRoom.chat.length) {
+        this.msgSinceOpen++;
+      }
+    },
   },
   methods: {
     sendMessage() {
@@ -30,7 +43,17 @@ export default {
 
 <template>
   <div class="chat-container" :class="{ open: isOpen }">
-    <button class="open-btn" @click="isOpen = !isOpen"></button>
+    <button
+      class="open-btn"
+      @click="
+        isOpen = !isOpen;
+        msgSinceOpen = 0;
+      "
+    >
+      <div class="chat-alert" v-show="msgSinceOpen > 0">
+        {{ msgSinceOpen > 9 ? `9+` : msgSinceOpen }}
+      </div>
+    </button>
 
     <div class="chat">
       <div class="messages">
@@ -85,7 +108,7 @@ export default {
   .chat {
     width: var(--chat-width);
     height: var(--chat-height);
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.65);
     border-radius: 0 1rem 1rem 0;
     border: 4px solid white;
     border-left: none;
@@ -161,7 +184,7 @@ export default {
         flex-grow: 1;
         resize: none;
         border-radius: 0.4rem;
-        opacity: 0.5;
+        opacity: 0.6;
         padding: 0.2rem 0.4rem;
         font-size: 1rem;
         outline: none;
@@ -169,7 +192,7 @@ export default {
         width: 100%;
 
         &:focus {
-          opacity: 0.6;
+          opacity: 0.8;
         }
       }
 
@@ -202,6 +225,40 @@ export default {
     outline: none;
     border: 4px solid white;
     border-left: none;
+
+    .chat-alert {
+      --size: 1.5rem;
+      position: absolute;
+      top: calc(var(--size) / -2);
+      right: calc(var(--size) / -2);
+      width: var(--size);
+      height: var(--size);
+      border-radius: var(--size);
+      background-color: rgb(231, 59, 59);
+      animation: pulse 2s infinite;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      --shadow-color: rgb(255, 0, 0);
+
+      @keyframes pulse {
+        from {
+          box-shadow: 0px 0px 12px 0px var(--shadow-color);
+        }
+
+        50% {
+          box-shadow: 0px 0px 0px 0px var(--shadow-color);
+        }
+
+        to {
+          box-shadow: 0px 0px 12px 0px var(--shadow-color);
+        }
+      }
+    }
 
     &::before,
     &::after {
