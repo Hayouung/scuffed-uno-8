@@ -58,7 +58,7 @@ export default {
       return this.$route.name;
     },
     disconnected() {
-      return this.$store.state.isConnected || this.$store.state.isOffline;
+      return !this.$store.state.isConnected || this.$store.state.isOffline;
     },
   },
   watch: {
@@ -83,7 +83,7 @@ export default {
     disconnected(val) {
       if (val) {
         if (this.$route.name !== "Home") {
-          this.$router.push({ name: "Home" });
+          this.$router.push({ name: "Home", query: this.$route.query });
         } else {
           this.refresh = !this.refresh;
         }

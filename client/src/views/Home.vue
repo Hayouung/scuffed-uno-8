@@ -99,18 +99,20 @@ export default {
       }
     },
     room(room) {
-      const players = ["You"];
+      const players = [room.you];
 
-      if (room.right) players.push(room.right.username);
-      if (room.top) players.push(room.top.username);
-      if (room.left) players.push(room.left.username);
+      if (room.right) players.push(room.right);
+      if (room.top) players.push(room.top);
+      if (room.left) players.push(room.left);
 
       const solo = [];
       for (let i = 0; i < players.length; i++) {
-        const username = players[i];
+        const p = players[i];
 
         solo.push({
-          action: username,
+          action: `${p.id === room.host ? "♛ " : ""}${
+            p.id === room.you.id ? "You" : p.username
+          }`,
           alwaysShowAction: true,
           graphic: require("@/assets/solo.jpg"),
           func: () => this.kickPlayer(i),
@@ -125,10 +127,8 @@ export default {
         });
       }
 
-      if (this.currentLevel === "solo") {
-        this.options.solo = solo;
-      } else {
-        this.options.onlineRoom = solo;
+      if (this.room.id) {
+        this.options[this.currentLevel] = solo;
       }
 
       if (room.started) {

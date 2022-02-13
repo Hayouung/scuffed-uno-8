@@ -19,6 +19,7 @@ const getIsLandscape = () => {
 const defaultRoom = {
   id: "",
   isHost: false,
+  host: {},
   turn: "",
   pile: [],
   started: false,
