@@ -115,10 +115,9 @@ export class Room implements RoomInterface {
     player.cards = [];
 
     // if only 1 player is left and remove is not replaced then kick last player as game cannot be played
-    if (this.players.length === 1 && !replace && this.started && this.host !== player) {
+    if (this.players.length === 1 && !replace && this.started && this.host !== player && !this.winner) {
       this.removePlayer(this.host, false);
       this.host.socket?.emit("kicked");
-      console.log("kicked");
     }
 
     if (this.turn === player) {
@@ -258,7 +257,8 @@ export class Room implements RoomInterface {
       !player.canPlay ||
       !player.cards[cardIndex] ||
       this.turn.id !== player.id ||
-      !player.cards[cardIndex].playable
+      !player.cards[cardIndex].playable ||
+      this.isRoomEmpty
     )
       return;
 
@@ -279,7 +279,7 @@ export class Room implements RoomInterface {
 
     switch (card.type) {
       case CardType.Plus2:
-        if (nextPlayer.cards.findIndex((c) => c.type === CardType.Plus2) !== -1) {
+        if (this.settings.stacking && nextPlayer.cards.findIndex((c) => c.type === CardType.Plus2) !== -1) {
           nextPlayer.mustStack = true;
           this.stack += 2;
         } else {
@@ -290,7 +290,7 @@ export class Room implements RoomInterface {
       case CardType.Plus4:
         incrementStat("plus4sDealt", 1);
 
-        if (nextPlayer.cards.findIndex((c) => c.type === CardType.Plus4) !== -1) {
+        if (this.settings.stacking && nextPlayer.cards.findIndex((c) => c.type === CardType.Plus4) !== -1) {
           nextPlayer.mustStack = true;
           this.stack += 4;
         } else {
@@ -327,6 +327,8 @@ export class Room implements RoomInterface {
   }
 
   async nextTurn(skip: boolean = false, draw: number = 0) {
+    if (this.isRoomEmpty) return;
+
     // reset inactivity timer
     this.inactivityTimer = 0;
 

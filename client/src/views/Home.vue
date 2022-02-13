@@ -30,7 +30,7 @@ export default {
       createRoomSoloForm: {
         username: "You",
         settings: {
-          stacking: false,
+          stacking: true,
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
@@ -42,7 +42,7 @@ export default {
         username: "",
         roomCode: "",
         settings: {
-          stacking: false,
+          stacking: true,
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
@@ -448,11 +448,10 @@ export default {
           class="rule"
         />
         <u-menu-input
-          v-model="createRoomSoloForm.settings.bluffing"
-          label="Bluffing"
+          v-model="createRoomSoloForm.settings.stacking"
+          label="Stacking"
           type="checkbox"
           class="rule"
-          style="opacity: 0.5; pointer-events: none"
         />
       </div>
 
@@ -509,11 +508,10 @@ export default {
           class="rule"
         />
         <u-menu-input
-          v-model="createRoomForm.settings.bluffing"
-          label="Bluffing"
+          v-model="createRoomForm.settings.stacking"
+          label="Stacking"
           type="checkbox"
           class="rule"
-          style="opacity: 0.5; pointer-events: none"
         />
       </div>
 

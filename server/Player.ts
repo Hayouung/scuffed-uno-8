@@ -111,7 +111,23 @@ export default class Player implements PlayerInterface {
         room.wildcard = card;
         room.broadcastState();
         await sleep(2000);
-        card.color = Math.floor(Math.random() * 4);
+
+        const colors = new Map<CardColor, number>();
+        this.cards.forEach((c) => colors.set(c.color, (colors.get(c.color) || 0) + 1));
+
+        if (Math.random() < 0.3) {
+          card.color = Math.floor(Math.random() * 4);
+        } else {
+          const tuple = Array.from(colors.entries())
+            .sort((a, b) => b[1] - a[1])
+            .filter((t) => t[0] !== CardColor.None);
+
+          card.color = tuple[0][0];
+
+          if (card.color === undefined) {
+            card.color = Math.floor(Math.random() * 4);
+          }
+        }
 
         switch (card.color) {
           case CardColor.Red:

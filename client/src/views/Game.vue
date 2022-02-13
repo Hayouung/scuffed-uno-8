@@ -39,6 +39,7 @@ export default {
       turnTimerInterval: null,
       forcePlayOfDrawnCard: false,
       showKeepCard: false,
+      showBluff: false,
     };
   },
   computed: {
@@ -450,9 +451,9 @@ export default {
 
       this.$nextTick(() => {
         this.$refs.unoAlert.style[anchor] = "4vh";
-        window.requestAnimationFrame(() => {
+        setTimeout(() => {
           this.$refs.unoAlert.style.transform = transform;
-        });
+        }, 20);
 
         setTimeout(() => {
           this.$refs.unoAlert.style.transform = "";
@@ -503,6 +504,10 @@ export default {
       this.showKeepCard = true;
     });
 
+    this.$store.state.socket.on("can-bluff", () => {
+      this.showBluff = true;
+    });
+
     if (this.isTurn) {
       this.startPlayersTurn();
     }
@@ -515,6 +520,7 @@ export default {
     window.onfocus = null;
 
     this.$store.state.socket.off("can-keep-card");
+    this.$store.state.socket.off("can-bluff");
   },
 };
 </script>
@@ -658,6 +664,22 @@ export default {
         >
         <u-menu-btn class="play-btn" @click="choicePlayCard"
           >Play Card</u-menu-btn
+        >
+      </div>
+
+      <div v-if="showBluff" class="keep-card-option">
+        <u-menu-btn
+          class="keep-btn"
+          @click="
+            $store.state.socket.emit('accept-plus4');
+            showBluff = false;
+          "
+          >Accept</u-menu-btn
+        >
+        <u-menu-btn
+          class="play-btn"
+          @click="$store.state.socket.emit('challenge-plus4')"
+          >Challenge</u-menu-btn
         >
       </div>
 
