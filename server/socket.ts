@@ -24,8 +24,21 @@ setInterval(() => {
   }
 }, 60000 * 3);
 
+const defaultSettings: Settings = {
+  maxPlayers: 4,
+  public: false,
+  stacking: true,
+  forcePlay: false,
+  drawToPlay: false,
+  bluffing: false,
+  seven0: false,
+};
+
 const validateSettings = (settings: any): Settings | false => {
   if (!settings || typeof settings !== "object") return false;
+
+  // merge settings with default (settings overwrites duplicate properties in defaultSettings)
+  settings = { ...defaultSettings, ...settings };
 
   const requiredSettings: {
     key: string;
@@ -37,6 +50,7 @@ const validateSettings = (settings: any): Settings | false => {
     { key: "forcePlay", type: "boolean" },
     { key: "drawToPlay", type: "boolean" },
     { key: "bluffing", type: "boolean" },
+    { key: "seven0", type: "boolean" },
   ];
 
   for (const rs of requiredSettings) {

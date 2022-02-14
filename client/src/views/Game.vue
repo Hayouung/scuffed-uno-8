@@ -9,6 +9,7 @@ import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 import Advert from "../components/Advert.vue";
 import Chat from "../components/Chat.vue";
+import UGamePickHand from "../components/Game/UGamePickHand.vue";
 
 export default {
   name: "Game",
@@ -23,6 +24,7 @@ export default {
     USettingsMenu,
     Advert,
     Chat,
+    UGamePickHand,
   },
   data() {
     return {
@@ -40,6 +42,7 @@ export default {
       forcePlayOfDrawnCard: false,
       showKeepCard: false,
       showBluff: false,
+      showPickHand: false,
     };
   },
   computed: {
@@ -350,6 +353,10 @@ export default {
         this.playerCards[index].type
       );
     },
+    pickHand(id) {
+      this.$store.state.socket.emit("pick-hand", id);
+      this.showPickHand = false;
+    },
     forcePlay() {
       if (!this.canPlayClient || !this.room.you.canPlay || this.turnTimer > 0)
         return;
@@ -508,6 +515,10 @@ export default {
       this.showBluff = true;
     });
 
+    this.$store.state.socket.on("can-pick-hand", () => {
+      this.showPickHand = true;
+    });
+
     if (this.isTurn) {
       this.startPlayersTurn();
     }
@@ -521,6 +532,7 @@ export default {
 
     this.$store.state.socket.off("can-keep-card");
     this.$store.state.socket.off("can-bluff");
+    this.$store.state.socket.off("can-pick-hand");
   },
 };
 </script>
@@ -598,6 +610,12 @@ export default {
       v-if="pickColor || (room.wildcard && !isTurn)"
       :isTurn="isTurn"
       @pick-color="wildcardColor = $event"
+    />
+
+    <u-game-pick-hand
+      v-if="showPickHand"
+      :isTurn="isTurn"
+      @pick-hand="pickHand($store.state.room[$event].id)"
     />
 
     <img ref="unoAlert" class="uno-alert" src="@/assets/logo.png" alt="" />

@@ -9,6 +9,7 @@ export interface Settings {
   forcePlay: boolean;
   bluffing: boolean;
   drawToPlay: boolean;
+  seven0: boolean;
   public: boolean;
   maxPlayers: number;
 }

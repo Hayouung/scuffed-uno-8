@@ -34,6 +34,7 @@ export default {
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
+          seven0: false,
           public: false,
           maxPlayers: 4,
         },
@@ -46,6 +47,7 @@ export default {
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
+          seven0: false,
           public: false,
           maxPlayers: 4,
         },
@@ -453,6 +455,12 @@ export default {
           type="checkbox"
           class="rule"
         />
+        <u-menu-input
+          v-model="createRoomSoloForm.settings.seven0"
+          label="7-0"
+          type="checkbox"
+          class="rule"
+        />
       </div>
 
       <div v-if="formError" class="response error">
@@ -510,6 +518,12 @@ export default {
         <u-menu-input
           v-model="createRoomForm.settings.stacking"
           label="Stacking"
+          type="checkbox"
+          class="rule"
+        />
+        <u-menu-input
+          v-model="createRoomForm.settings.seven0"
+          label="7-0"
           type="checkbox"
           class="rule"
         />
@@ -755,6 +769,7 @@ img {
     display: flex;
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
 
     .rule {
       width: auto;
