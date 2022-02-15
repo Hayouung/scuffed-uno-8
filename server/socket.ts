@@ -275,6 +275,18 @@ export default function(socket: Socket) {
     room.nextTurn();
   });
 
+  socket.on("pick-hand", (id: string) => {
+    if (!player.inRoom || !player.canPickHand) return;
+
+    const room = rooms[player.roomId];
+    if (!room.started || room.turn.id !== player.id) return;
+
+    const swap = room.players.find((p) => p.id === id);
+    if (!swap) return;
+
+    room.swapHands(player, swap, true);
+  });
+
   const messageLimiter = new RateLimiter({ tokensPerInterval: 30, interval: "minute" });
 
   socket.on("room-send-message", async (m: ChatMessage) => {

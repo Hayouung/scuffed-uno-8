@@ -13,6 +13,12 @@ export default {
         return {};
       },
     },
+    swap: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
   },
 };
 </script>
@@ -23,6 +29,7 @@ export default {
       v-if="room.right"
       class="cards other right"
       :style="{ '--count': `${room.right.count}` }"
+      :class="{ swap: swap.right }"
     >
       <Card
         v-for="i in room.right.count"
@@ -35,6 +42,7 @@ export default {
       v-if="room.left"
       class="cards other left"
       :style="{ '--count': `${room.left.count}` }"
+      :class="{ swap: swap.left }"
     >
       <Card
         v-for="i in room.left.count"
@@ -47,6 +55,7 @@ export default {
       v-if="room.top"
       class="cards other top"
       :style="{ '--count': `${room.top.count}` }"
+      :class="{ swap: swap.top }"
     >
       <Card
         v-for="i in room.top.count"
@@ -73,10 +82,10 @@ $mobile: 900px;
   position: absolute;
 
   .card {
-    margin-left: max(calc(-5.5px * var(--count)), -105px) !important;
+    margin-left: max(calc(-5.5px * var(--count)), -105px);
 
     @media screen and (max-width: $mobile) {
-      margin-left: max(calc(-2.75px * var(--count)), -52.5px) !important;
+      margin-left: max(calc(-2.75px * var(--count)), -52.5px);
     }
   }
 

@@ -21,27 +21,28 @@ export default class Deck {
     colors.forEach((color) => {
       // create 0
       this.cards.push(new Card(0, color, CardType.None));
+      this.cards.push(new Card(7, color, CardType.None));
 
       // create 2 of each number 1 to 9
-      for (let number = 1; number <= 9; number++) {
-        this.cards.push(new Card(number, color, CardType.None));
-        this.cards.push(new Card(number, color, CardType.None));
-      }
+      // for (let number = 1; number <= 9; number++) {
+      //   this.cards.push(new Card(number, color, CardType.None));
+      //   this.cards.push(new Card(number, color, CardType.None));
+      // }
 
-      // create 2 of each plus 2, reverse, skip
-      for (let type: CardType = CardType.Plus2; type <= CardType.Reverse; type++) {
-        this.cards.push(new Card(-1, color, type));
-        this.cards.push(new Card(-1, color, type));
-      }
+      // // create 2 of each plus 2, reverse, skip
+      // for (let type: CardType = CardType.Plus2; type <= CardType.Reverse; type++) {
+      //   this.cards.push(new Card(-1, color, type));
+      //   this.cards.push(new Card(-1, color, type));
+      // }
     });
 
     // create 4 of wildcard, plus4
-    for (let type: CardType = CardType.Wildcard; type <= CardType.Plus4; type++) {
-      this.cards.push(new Card(-1, CardColor.None, type));
-      this.cards.push(new Card(-1, CardColor.None, type));
-      this.cards.push(new Card(-1, CardColor.None, type));
-      this.cards.push(new Card(-1, CardColor.None, type));
-    }
+    // for (let type: CardType = CardType.Wildcard; type <= CardType.Plus4; type++) {
+    //   this.cards.push(new Card(-1, CardColor.None, type));
+    //   this.cards.push(new Card(-1, CardColor.None, type));
+    //   this.cards.push(new Card(-1, CardColor.None, type));
+    //   this.cards.push(new Card(-1, CardColor.None, type));
+    // }
   }
 
   shuffleDeck() {

@@ -43,6 +43,13 @@ export default {
       showKeepCard: false,
       showBluff: false,
       showPickHand: false,
+      swapHandAnim: false,
+      swap: {
+        right: false,
+        left: false,
+        top: false,
+        you: false,
+      },
     };
   },
   computed: {
@@ -299,6 +306,8 @@ export default {
       );
       if (!cardElement) return;
 
+      if (this.swapHandAnim) return;
+
       if (toStack) {
         const box = cardElement.getBoundingClientRect();
         const centerX = window.innerWidth / 2;
@@ -500,6 +509,17 @@ export default {
 
       this.showKeepCard = false;
     },
+    getPositionFromId(id) {
+      if (this.room.right && this.room.right.id === id) {
+        return "right";
+      } else if (this.room.left && this.room.left.id === id) {
+        return "left";
+      } else if (this.room.top && this.room.top.id === id) {
+        return "top";
+      } else if (this.room.you && this.room.you.id === id) {
+        return "you";
+      }
+    },
   },
   mounted() {
     if (!this.room.id) return this.$router.push({ name: "Home" });
@@ -519,6 +539,22 @@ export default {
       this.showPickHand = true;
     });
 
+    this.$store.state.socket.on("swap-hand-anim", (pId, sId) => {
+      this.swapHandAnim = true;
+
+      const p = this.getPositionFromId(pId);
+      const s = this.getPositionFromId(sId);
+
+      this.swap[p] = true;
+      this.swap[s] = true;
+
+      setTimeout(() => {
+        this.swapHandAnim = false;
+        this.swap[p] = false;
+        this.swap[s] = false;
+      }, 800);
+    });
+
     if (this.isTurn) {
       this.startPlayersTurn();
     }
@@ -533,6 +569,7 @@ export default {
     this.$store.state.socket.off("can-keep-card");
     this.$store.state.socket.off("can-bluff");
     this.$store.state.socket.off("can-pick-hand");
+    this.$store.state.socket.off("swap-hand-anim");
   },
 };
 </script>
@@ -618,6 +655,24 @@ export default {
       @pick-hand="pickHand($store.state.room[$event].id)"
     />
 
+    <u-game-pick-hand
+      v-else-if="$store.state.room.right.canPickHand"
+      :isTurn="false"
+      class="right"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.left.canPickHand"
+      :isTurn="false"
+      class="left"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.top.canPickHand"
+      :isTurn="false"
+      class="top"
+    />
+
     <img ref="unoAlert" class="uno-alert" src="@/assets/logo.png" alt="" />
 
     <div class="animation-cards">
@@ -649,7 +704,7 @@ export default {
 
     <div class="direction" :class="{ reverse: !room.directionReversed }" />
 
-    <u-game-other-cards :room="room" />
+    <u-game-other-cards :room="room" :swap="swap" />
 
     <div class="hud">
       <h1 class="stack-count" v-if="room.stack > 0">+{{ room.stack }}</h1>
@@ -704,7 +759,7 @@ export default {
       <div
         v-if="room.you"
         class="cards you"
-        :class="{ turn: isTurn && room.you.canPlay }"
+        :class="{ turn: isTurn && room.you.canPlay, swap: swap.you }"
         :style="{ '--count': `${room.you.count}` }"
       >
         <Card
@@ -1071,6 +1126,16 @@ $table-rotatex: 58deg;
   flex-direction: row;
   margin-bottom: 50px;
   margin-top: auto;
+
+  &.swap {
+    .card {
+      margin-left: -127px !important;
+
+      @media screen and (max-width: $mobile) {
+        margin-left: -63.5px !important;
+      }
+    }
+  }
 
   &.you {
     transition: transform 0.5s ease, filter 0.5s ease;

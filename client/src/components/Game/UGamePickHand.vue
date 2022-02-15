@@ -22,6 +22,22 @@ export default {
   </div>
 </template>
 
+<style lang="scss">
+.hand-picker {
+  &.right {
+    transform: rotate(-90deg);
+  }
+
+  &.left {
+    transform: rotate(90deg);
+  }
+
+  &.top {
+    transform: rotate(180deg);
+  }
+}
+</style>
+
 <style lang="scss" scoped>
 $table-rotatex: 0deg;
 

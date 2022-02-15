@@ -17,6 +17,7 @@ interface PlayerInterface {
   canDraw: boolean;
   drawing: boolean;
   canPlay: boolean;
+  canPickHand: boolean;
 
   sortCards(): void;
   findPlayableCards(topCard: Card): void;
@@ -38,6 +39,7 @@ export default class Player implements PlayerInterface {
   canDraw = false;
   drawing = false;
   canPlay = false;
+  canPickHand = false;
 
   constructor(socket: Socket | null, bot: boolean = false) {
     this.bot = bot;
@@ -157,6 +159,11 @@ export default class Player implements PlayerInterface {
         this.cards.findIndex((c) => c === card)
       );
     }, 1500);
+  }
+
+  botSwapHands(r: Room) {
+    const swap = r.players.filter((p) => p.id !== this.id).sort((a, b) => a.cards.length - b.cards.length)[0];
+    r.swapHands(this, swap, true);
   }
 }
 

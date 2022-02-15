@@ -302,14 +302,59 @@ export class Room implements RoomInterface {
       case CardType.Reverse:
         this.directionReversed = !this.directionReversed;
         break;
+      case CardType.None:
+        if (this.settings.seven0) {
+          if (card.number === 7 || card.number === 0) {
+            this.checkForWinner();
+            if (this.winner) {
+              this.broadcastState();
+              incrementStat("gamesPlayed", 1);
+              return;
+            }
+
+            player.canPlay = false;
+            player.canDraw = false;
+            this.broadcastState();
+            await sleep(500);
+          }
+
+          if (card.number === 7) {
+            player.canPickHand = true;
+            this.broadcastState();
+
+            if (player.bot) {
+              await sleep(1200);
+              player.botSwapHands(this);
+            } else {
+              player.socket?.emit("can-pick-hand");
+              this.broadcastState();
+            }
+            return;
+          } else if (card.number === 0) {
+            const hands = this.players.map((p) => p.cards);
+
+            // swap hands in direction of play
+            for (let i = 0; i < this.players.length; i++) {
+              const index = this.directionReversed ? this.players.length - 1 - i : i;
+              let nextIndex = this.directionReversed ? index - 1 : index + 1;
+              if (nextIndex < 0) nextIndex = this.players.length - 1;
+              if (nextIndex >= this.players.length) nextIndex = 0;
+
+              this.players[nextIndex].cards = hands[index];
+
+              this.broadcastSwapHand(this.players[index], this.players[nextIndex]);
+            }
+
+            await sleep(600);
+            this.broadcastState();
+            await sleep(600);
+          }
+        }
+        break;
     }
 
     // punish player for not calling uno
-    // TODO make other players need to call out player to be punished
-    if (player.cards.length === 1 && !player.hasCalledUno) {
-      await this.drawCards(player, 2);
-    }
-    player.hasCalledUno = false;
+    await this.punishMissedUno(player);
 
     // go to next turn
     if (
@@ -318,6 +363,32 @@ export class Room implements RoomInterface {
     ) {
       this.nextTurn(true, draw);
     } else {
+      this.nextTurn();
+    }
+  }
+
+  async punishMissedUno(player: Player) {
+    // TODO make other players need to call out player to be punished
+    if (player.cards.length === 1 && !player.hasCalledUno) {
+      await this.drawCards(player, 2);
+    }
+    player.hasCalledUno = false;
+  }
+
+  async swapHands(p: Player, swap: Player, seven: boolean) {
+    const h = p.cards;
+    p.cards = swap.cards;
+    swap.cards = h;
+
+    if (seven) {
+      await this.punishMissedUno(p);
+
+      this.broadcastSwapHand(p, swap);
+      await sleep(600);
+
+      this.broadcastState();
+      await sleep(600);
+
       this.nextTurn();
     }
   }
@@ -336,6 +407,7 @@ export class Room implements RoomInterface {
     this.turn.clearPlayableCards();
     this.turn.canDraw = false;
     this.turn.canPlay = false;
+    this.turn.canPickHand = false;
 
     if (skip || draw !== 0) {
       this.turn = this.getNextPlayer();
@@ -408,22 +480,32 @@ export class Room implements RoomInterface {
     return this.players[newIndex];
   }
 
+  getOtherPlayers(player: Player) {
+    let right;
+    let top;
+    let left;
+    switch (this.players.length) {
+      case 4:
+        left = this.getPlayerPosFromOffset(player, 3);
+      case 3:
+        top = this.getPlayerPosFromOffset(player, 2);
+      case 2:
+        right = this.getPlayerPosFromOffset(player, 1);
+        break;
+    }
+
+    return {
+      left,
+      right,
+      top,
+    };
+  }
+
   broadcastState() {
     this.players.forEach((player) => {
       if (player.bot) return;
 
-      let right;
-      let top;
-      let left;
-      switch (this.players.length) {
-        case 4:
-          left = this.getPlayerPosFromOffset(player, 3);
-        case 3:
-          top = this.getPlayerPosFromOffset(player, 2);
-        case 2:
-          right = this.getPlayerPosFromOffset(player, 1);
-          break;
-      }
+      const { left, right, top } = this.getOtherPlayers(player);
 
       const winner = this.winner ? { username: this.winner.username, id: this.winner.id } : undefined;
 
@@ -455,6 +537,7 @@ export class Room implements RoomInterface {
               isBot: right.bot,
               calledUno: right.hasCalledUno,
               skip: !right.canPlay && this.turn.id === right.id,
+              canPickHand: right.canPickHand,
             }
           : undefined,
         top: top
@@ -465,6 +548,7 @@ export class Room implements RoomInterface {
               isBot: top.bot,
               calledUno: top.hasCalledUno,
               skip: !top.canPlay && this.turn.id === top.id,
+              canPickHand: top.canPickHand,
             }
           : undefined,
         left: left
@@ -475,12 +559,21 @@ export class Room implements RoomInterface {
               isBot: left.bot,
               calledUno: left.hasCalledUno,
               skip: !left.canPlay && this.turn.id === left.id,
+              canPickHand: left.canPickHand,
             }
           : undefined,
         winner,
       };
 
       player.socket?.emit("state", state);
+    });
+  }
+
+  broadcastSwapHand(player: Player, swap: Player) {
+    this.players.forEach((p) => {
+      if (p.bot) return;
+
+      p.socket?.emit("swap-hand-anim", player.id, swap.id);
     });
   }
 
