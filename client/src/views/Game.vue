@@ -363,7 +363,10 @@ export default {
         this.playerCards[index].type
       );
     },
-    pickHand(id) {
+    pickHand(pos) {
+      if (!this.$store.state.room[pos]) return;
+
+      const id = this.$store.state.room[pos].id;
       this.$store.state.socket.emit("pick-hand", id);
       this.showPickHand = false;
     },
@@ -665,23 +668,23 @@ export default {
     <u-game-pick-hand
       v-if="showPickHand"
       :isTurn="isTurn"
-      @pick-hand="pickHand($store.state.room[$event].id)"
+      @pick-hand="pickHand"
     />
 
     <u-game-pick-hand
-      v-else-if="$store.state.room.right.canPickHand"
+      v-else-if="$store.state.room.right && $store.state.room.right.canPickHand"
       :isTurn="false"
       class="right"
     />
 
     <u-game-pick-hand
-      v-else-if="$store.state.room.left.canPickHand"
+      v-else-if="$store.state.room.left && $store.state.room.left.canPickHand"
       :isTurn="false"
       class="left"
     />
 
     <u-game-pick-hand
-      v-else-if="$store.state.room.top.canPickHand"
+      v-else-if="$store.state.room.top && $store.state.room.top.canPickHand"
       :isTurn="false"
       class="top"
     />
