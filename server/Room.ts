@@ -128,7 +128,7 @@ export class Room implements RoomInterface {
     }
   }
 
-  startGame() {
+  async startGame() {
     this.deck.generateDeck();
     this.deck.shuffleDeck();
 
@@ -140,6 +140,8 @@ export class Room implements RoomInterface {
 
     // give players cards
     this.players.forEach((p) => {
+      p.cards = [];
+
       for (let i = 0; i < 1; i++) {
         this.giveCard(p);
       }
@@ -147,13 +149,15 @@ export class Room implements RoomInterface {
       p.sortCards();
     });
 
-    // pick player to start (player after this player will actually play first)
-    const randIndex = Math.floor(Math.random() * this.players.length);
-    this.turn = this.players[randIndex];
-
     this.started = true;
 
     this.broadcastState();
+
+    // pick player to start (player after randIndex will actually play first)
+    const randIndex = Math.floor(Math.random() * this.players.length);
+    this.turn = this.players[randIndex];
+
+    this.nextTurn();
 
     // start inactivity timer
     this.inactivityTimerInterval = setInterval(async () => {
@@ -163,8 +167,6 @@ export class Room implements RoomInterface {
         this.players.forEach((p) => (!p.bot ? this.removePlayer(p, false) : null));
       }
     }, 1000);
-
-    this.nextTurn();
   }
 
   // giveCard takes the first card from the deck array and pushes it onto player's cards
@@ -256,7 +258,8 @@ export class Room implements RoomInterface {
       !player.cards[cardIndex] ||
       this.turn.id !== player.id ||
       !player.cards[cardIndex].playable ||
-      this.isRoomEmpty
+      this.isRoomEmpty ||
+      this.winner
     )
       return;
 
@@ -397,7 +400,7 @@ export class Room implements RoomInterface {
   }
 
   async nextTurn(skip: boolean = false, draw: number = 0) {
-    if (this.isRoomEmpty) return;
+    if (this.isRoomEmpty || this.winner) return;
 
     // reset inactivity timer
     this.inactivityTimer = 0;
