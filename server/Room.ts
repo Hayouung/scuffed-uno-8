@@ -142,7 +142,7 @@ export class Room implements RoomInterface {
     this.players.forEach((p) => {
       p.cards = [];
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 7; i++) {
         this.giveCard(p);
       }
 
