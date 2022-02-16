@@ -91,7 +91,7 @@ export default {
 
 <style lang="scss" scoped>
 .chat-container {
-  --chat-width: min(35rem, 60vw);
+  --chat-width: min(35rem, 45vw);
   --chat-height: min(40rem, 100vh);
 
   position: absolute;
