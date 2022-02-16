@@ -50,6 +50,7 @@ export default {
         top: false,
         you: false,
       },
+      isPlayAgain: false,
     };
   },
   computed: {
@@ -520,6 +521,13 @@ export default {
         return "you";
       }
     },
+    playAgain() {
+      this.$store.commit("RESET_ROOM");
+      this.$store.state.socket.emit("play-again");
+      this.isPlayAgain = true;
+
+      this.$router.push({ name: "Home", params: { playAgain: true } });
+    },
   },
   mounted() {
     if (!this.room.id) return this.$router.push({ name: "Home" });
@@ -560,7 +568,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.leaveRoom();
+    if (!this.isPlayAgain) this.leaveRoom();
   },
   destroyed() {
     window.onblur = null;
@@ -632,7 +640,12 @@ export default {
       :title="`Congratulations to ${room.winner.username} on winning the game!`"
       hideClose
     >
-      <button class="btn rounded-btn" @click="leaveRoom">Main Menu</button>
+      <div style="display: flex; gap: 2rem">
+        <button class="btn rounded-btn success" @click="playAgain">
+          Play Again
+        </button>
+        <button class="btn rounded-btn" @click="leaveRoom">Main Menu</button>
+      </div>
     </u-menu-modal>
 
     <button class="settings-btn" @click="showSettings = !showSettings"></button>
@@ -901,6 +914,14 @@ $table-rotatex: 58deg;
 
   &:hover {
     background-color: #ff8e0d;
+  }
+
+  &.success {
+    background-color: #0cb40c;
+
+    &:hover {
+      background-color: #1fc91f;
+    }
   }
 }
 

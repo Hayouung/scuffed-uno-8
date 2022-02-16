@@ -38,6 +38,7 @@ interface RoomInterface {
   wildcard: Card | null;
   settings: Settings;
   chat: ChatMessage[];
+  nextId: string;
 
   addPlayer(player: Player): void;
   removePlayer(player: Player): void;
@@ -65,6 +66,7 @@ export class Room implements RoomInterface {
   wildcard: Card | null = null;
   settings: Settings;
   chat: ChatMessage[] = [];
+  nextId = "";
 
   constructor(host: Player, settings: Settings, id: string = "") {
     this.id = id || uuid().substr(0, 7);
@@ -138,23 +140,16 @@ export class Room implements RoomInterface {
 
     // give players cards
     this.players.forEach((p) => {
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 1; i++) {
         this.giveCard(p);
       }
 
       p.sortCards();
     });
 
-    // pick player to start
+    // pick player to start (player after this player will actually play first)
     const randIndex = Math.floor(Math.random() * this.players.length);
     this.turn = this.players[randIndex];
-    this.turn.findPlayableCards(this.topCard());
-    this.turn.canDraw = true;
-    this.turn.canPlay = true;
-
-    if (this.turn.bot) {
-      this.turn.botPlay(this);
-    }
 
     this.started = true;
 
@@ -168,6 +163,8 @@ export class Room implements RoomInterface {
         this.players.forEach((p) => (!p.bot ? this.removePlayer(p, false) : null));
       }
     }, 1000);
+
+    this.nextTurn();
   }
 
   // giveCard takes the first card from the deck array and pushes it onto player's cards
@@ -272,6 +269,14 @@ export class Room implements RoomInterface {
     const card = player.cards[cardIndex];
     player.cards.splice(cardIndex, 1);
 
+    // check if player has won
+    this.checkForWinner();
+    if (this.winner) {
+      this.broadcastState();
+      incrementStat("gamesPlayed", 1);
+      return;
+    }
+
     // put card on pile
     this.pile.push(card);
 
@@ -305,13 +310,6 @@ export class Room implements RoomInterface {
       case CardType.None:
         if (this.settings.seven0) {
           if (card.number === 7 || card.number === 0) {
-            this.checkForWinner();
-            if (this.winner) {
-              this.broadcastState();
-              incrementStat("gamesPlayed", 1);
-              return;
-            }
-
             player.canPlay = false;
             player.canDraw = false;
             this.broadcastState();

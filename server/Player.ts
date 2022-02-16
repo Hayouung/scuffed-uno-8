@@ -124,7 +124,7 @@ export default class Player implements PlayerInterface {
             .sort((a, b) => b[1] - a[1])
             .filter((t) => t[0] !== CardColor.None);
 
-          card.color = tuple[0][0];
+          card.color = tuple.length > 0 ? tuple[0][0] : <CardColor>(undefined as any);
 
           if (card.color === undefined) {
             card.color = Math.floor(Math.random() * 4);

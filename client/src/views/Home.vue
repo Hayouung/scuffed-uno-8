@@ -272,6 +272,11 @@ export default {
         window.GameAdsRenew("gameadsbanner");
       }
     }, 17000);
+
+    if (this.$route.params.playAgain) {
+
+      this.currentLevel = "onlineRoom";
+    }
   },
   destroyed() {
     clearInterval(this.gameAdsInterval);

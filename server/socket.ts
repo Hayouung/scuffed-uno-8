@@ -89,6 +89,8 @@ export default function(socket: Socket) {
     if (!player.inRoom) return;
 
     const room = rooms[player.roomId];
+    if (!room) return;
+
     room.removePlayer(player, false);
     updatePublicRoomPlayerCount(player, -1, room.id);
 
@@ -102,7 +104,33 @@ export default function(socket: Socket) {
     delete players[socket.id];
   });
 
-  socket.on("create-room", ({ username = "", roomCode = "", settings }) => {
+  const joinRoom = ({ username = "", roomCode = "" }) => {
+    if (player.inRoom) return socket.emit("kicked");
+
+    // validate data
+    if (username.length < 2 || username.length > 11) return socket.emit("kicked");
+    if (roomCode.length < 4 || roomCode.length > 12) return socket.emit("kicked");
+
+    // get room
+    const room = rooms[roomCode];
+    if (!room || room.players.length === room.settings.maxPlayers || room.started || room.isRoomEmpty)
+      return socket.emit("kicked");
+
+    player.username = username;
+    room.addPlayer(player);
+
+    updatePublicRoomPlayerCount(player, 1);
+  };
+
+  const createRoom = ({
+    username = "",
+    roomCode = "",
+    settings,
+  }: {
+    username: string;
+    roomCode: string;
+    settings: any;
+  }) => {
     if (player.inRoom) return;
 
     // validate data
@@ -132,27 +160,9 @@ export default function(socket: Socket) {
         maxPlayers: room.settings.maxPlayers,
         playerCount: room.players.length,
       });
-  });
+  };
 
-  socket.on("join-room", ({ username = "", roomCode = "" }) => {
-    if (player.inRoom) return socket.emit("kicked");
-
-    // validate data
-    if (username.length < 2 || username.length > 11) return socket.emit("kicked");
-    if (roomCode.length < 4 || roomCode.length > 12) return socket.emit("kicked");
-
-    // get room
-    const room = rooms[roomCode];
-    if (!room || room.players.length === room.settings.maxPlayers || room.started || room.isRoomEmpty)
-      return socket.emit("kicked");
-
-    player.username = username;
-    room.addPlayer(player);
-
-    updatePublicRoomPlayerCount(player, 1);
-  });
-
-  socket.on("add-bot", () => {
+  const addBot = () => {
     if (!player.inRoom) return;
 
     const room = rooms[player.roomId];
@@ -162,7 +172,13 @@ export default function(socket: Socket) {
     room.broadcastState();
 
     updatePublicRoomPlayerCount(player, 1);
-  });
+  };
+
+  socket.on("create-room", createRoom);
+
+  socket.on("join-room", joinRoom);
+
+  socket.on("add-bot", addBot);
 
   socket.on("kick-player", (id: string) => {
     if (!player.inRoom) return;
@@ -310,5 +326,37 @@ export default function(socket: Socket) {
 
   socket.on("get-public-rooms", () => {
     socket.emit("recieve-public-rooms", publicRooms);
+  });
+
+  socket.on("play-again", () => {
+    if (!player.inRoom) return;
+
+    const room = rooms[player.roomId];
+    if (!room) return;
+
+    leaveRoom();
+
+    if (room.nextId) {
+      joinRoom({ username: player.username, roomCode: room.nextId });
+    } else {
+      createRoom({ username: player.username, roomCode: "", settings: room.settings });
+      room.nextId = player.roomId;
+
+      const newRoom = rooms[room.nextId];
+      newRoom.chat = room.chat;
+
+      room.players.forEach((p) => {
+        if (p.bot) {
+          room.removePlayer(p, false);
+
+          newRoom.addBot(p);
+
+          updatePublicRoomPlayerCount(player, 1);
+        }
+      });
+
+      room.broadcastState();
+      newRoom.broadcastState();
+    }
   });
 }
