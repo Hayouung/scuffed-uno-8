@@ -164,7 +164,12 @@ export class Room implements RoomInterface {
       this.inactivityTimer++;
 
       if (this.inactivityTimer === 300) {
-        this.players.forEach((p) => (!p.bot ? this.removePlayer(p, false) : null));
+        this.players.forEach((p) => {
+          if (p.bot) return;
+
+          this.removePlayer(p, false);
+          p.socket?.emit("kicked");
+        });
       }
     }, 1000);
   }
