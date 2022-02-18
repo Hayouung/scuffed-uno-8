@@ -291,6 +291,8 @@ export class Room implements RoomInterface {
     const nextPlayer = this.getNextPlayer();
     let draw = 0;
 
+    let needsUnoPunished = this.needsUnoPunished(player);
+
     switch (card.type) {
       case CardType.Plus2:
         if (this.settings.stacking && nextPlayer.cards.findIndex((c) => c.type === CardType.Plus2) !== -1) {
@@ -360,7 +362,7 @@ export class Room implements RoomInterface {
     }
 
     // punish player for not calling uno
-    await this.punishMissedUno(player);
+    await this.punishMissedUno(player, needsUnoPunished);
 
     // go to next turn
     if (
@@ -373,9 +375,13 @@ export class Room implements RoomInterface {
     }
   }
 
-  async punishMissedUno(player: Player) {
+  needsUnoPunished(player: Player) {
+    return player.cards.length === 1 && !player.hasCalledUno;
+  }
+
+  async punishMissedUno(player: Player, force = false) {
     // TODO make other players need to call out player to be punished
-    if (player.cards.length === 1 && !player.hasCalledUno) {
+    if (this.needsUnoPunished(player) || force) {
       await this.drawCards(player, 2);
     }
     player.hasCalledUno = false;
@@ -387,11 +393,13 @@ export class Room implements RoomInterface {
     swap.cards = h;
 
     if (seven) {
-      await this.punishMissedUno(p);
-
       this.broadcastSwapHand(p, swap);
       await sleep(600);
 
+      this.broadcastState();
+      await sleep(600);
+
+      await this.punishMissedUno(p);
       this.broadcastState();
       await sleep(600);
 

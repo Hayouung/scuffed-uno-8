@@ -791,7 +791,7 @@ export default {
         />
       </div>
 
-      <u-game-player-cards :room="room" :is-turn="isTurn" />
+      <u-game-player-cards :room="room" :is-turn="isTurn" :swap="swap" />
 
       <button
         v-if="room.isHost && !room.started && room.playerCount > 1"
