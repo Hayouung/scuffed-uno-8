@@ -2,8 +2,7 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  publicPath: "/d4lg1jqo79hb03td83ba97meh6s7fpt6/",
-  assetsDir: "d4lg1jqo79hb03td83ba97meh6s7fpt6/",
+  publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
 
   chainWebpack: (config) => {
     config.plugin("html").tap((args) => {

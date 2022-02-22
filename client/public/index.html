@@ -56,11 +56,11 @@
       }
     </script>
 
-    <script
+    <!-- <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2444394876892971"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
   </head>
   <body>
     <noscript>
@@ -92,6 +92,8 @@
         },
       };
       (function(a, b, c) {
+        if (window.location.hostname === "localhost") return;
+
         var d = a.getElementsByTagName(b)[0];
         a.getElementById(c) ||
           ((a = a.createElement(b)),

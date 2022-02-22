@@ -263,12 +263,10 @@ export default {
       this.fetchingPublicRooms = false;
     });
 
-    if (typeof sdk !== "undefined" && window.sdk.showBanner !== "undefined") {
-      window.sdk.showBanner();
-    }
+    window.showAd();
   },
   destroyed() {
-    clearInterval(this.gameAdsInterval);
+    // clearInterval(this.gameAdsInterval);
 
     observer.disconnect();
     this.$store.state.socket.off("recieve-public-rooms");
@@ -344,14 +342,14 @@ export default {
       <div id="gameadsbanner"></div>
     </div> -->
 
-    <a
+    <!-- <a
       class="watermark stats-link"
       style="bottom: max(5.5vh, 1.7rem)"
       href="https://www.play-games.com/game/29996/scuffed-uno.html"
       target="_blank"
     >
       play-games.com
-    </a>
+    </a> -->
 
     <router-link class="watermark stats-link" to="/stats">
       Global Stats
