@@ -274,7 +274,6 @@ export default {
     }, 17000);
 
     if (this.$route.params.playAgain) {
-
       this.currentLevel = "onlineRoom";
     }
   },
@@ -364,10 +363,20 @@ export default {
 
     <a
       class="watermark stats-link"
-      style="bottom: 5.5vh"
+      style="bottom: max(9.5vh, 3rem)"
       href="https://kevin.games"
+      target="_blank"
     >
       More Games
+    </a>
+
+    <a
+      class="watermark stats-link"
+      style="bottom: max(5.5vh, 1.7rem)"
+      href="https://www.play-games.com/game/29996/scuffed-uno.html"
+      target="_blank"
+    >
+      play-games.com
     </a>
 
     <router-link class="watermark stats-link" to="/stats">
