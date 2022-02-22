@@ -39,7 +39,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
-  z-index: 1002;
+  z-index: 1005;
 
   .modal {
     width: 100%;
@@ -105,6 +105,7 @@ export default {
       font-size: 2rem;
       font-weight: bold;
       margin-bottom: 20px;
+      text-align: center;
     }
   }
 }

@@ -1,8 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "@/views/Home.vue";
-import Game from "@/views/Game.vue";
-import Stats from "@/views/Stats.vue";
+const Home = () => import("@/views/Home.vue");
+const Game = () => import("@/views/Game.vue");
+const Stats = () => import("@/views/Stats.vue");
 
 Vue.use(VueRouter);
 
@@ -27,19 +27,6 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
   routes,
-});
-
-router.afterEach((to) => {
-  const c = to.name === "Home" ? "ad-home" : "ad-game";
-  const ads = document.getElementsByClassName("ad");
-
-  Array.from(ads).forEach((ad) => {
-    if (!ad.classList.contains(c)) {
-      ad.classList.add("ad-hide");
-    } else {
-      ad.classList.remove("ad-hide");
-    }
-  });
 });
 
 export default router;

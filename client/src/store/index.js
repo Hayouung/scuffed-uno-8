@@ -19,6 +19,7 @@ const getIsLandscape = () => {
 const defaultRoom = {
   id: "",
   isHost: false,
+  host: {},
   turn: "",
   pile: [],
   started: false,
@@ -30,6 +31,7 @@ const defaultRoom = {
   left: {},
   top: {},
   winner: {},
+  chat: [],
 };
 
 const store = new Vuex.Store({
@@ -45,6 +47,8 @@ const store = new Vuex.Store({
     room: { ...defaultRoom },
     soundController: null,
     kicked: false,
+    showAdApology: false,
+    adClient: "ca-pub-2444394876892971",
   },
   mutations: {
     SET_WINDOW_DIMENSIONS(state, { width, height }) {

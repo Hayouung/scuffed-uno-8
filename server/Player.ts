@@ -17,6 +17,7 @@ interface PlayerInterface {
   canDraw: boolean;
   drawing: boolean;
   canPlay: boolean;
+  canPickHand: boolean;
 
   sortCards(): void;
   findPlayableCards(topCard: Card): void;
@@ -38,6 +39,7 @@ export default class Player implements PlayerInterface {
   canDraw = false;
   drawing = false;
   canPlay = false;
+  canPickHand = false;
 
   constructor(socket: Socket | null, bot: boolean = false) {
     this.bot = bot;
@@ -111,7 +113,23 @@ export default class Player implements PlayerInterface {
         room.wildcard = card;
         room.broadcastState();
         await sleep(2000);
-        card.color = Math.floor(Math.random() * 4);
+
+        const colors = new Map<CardColor, number>();
+        this.cards.forEach((c) => colors.set(c.color, (colors.get(c.color) || 0) + 1));
+
+        if (Math.random() < 0.3) {
+          card.color = Math.floor(Math.random() * 4);
+        } else {
+          const tuple = Array.from(colors.entries())
+            .sort((a, b) => b[1] - a[1])
+            .filter((t) => t[0] !== CardColor.None);
+
+          card.color = tuple.length > 0 ? tuple[0][0] : <CardColor>(undefined as any);
+
+          if (card.color === undefined) {
+            card.color = Math.floor(Math.random() * 4);
+          }
+        }
 
         switch (card.color) {
           case CardColor.Red:
@@ -141,6 +159,11 @@ export default class Player implements PlayerInterface {
         this.cards.findIndex((c) => c === card)
       );
     }, 1500);
+  }
+
+  botSwapHands(r: Room) {
+    const swap = r.players.filter((p) => p.id !== this.id).sort((a, b) => a.cards.length - b.cards.length)[0];
+    r.swapHands(this, swap, true);
   }
 }
 

@@ -9,8 +9,16 @@ export interface Settings {
   forcePlay: boolean;
   bluffing: boolean;
   drawToPlay: boolean;
+  seven0: boolean;
   public: boolean;
   maxPlayers: number;
+}
+
+export interface ChatMessage {
+  text: string;
+  username: string;
+  id: string;
+  time: number;
 }
 
 interface RoomInterface {
@@ -29,6 +37,8 @@ interface RoomInterface {
   inactivityTimerInterval: NodeJS.Timeout | null;
   wildcard: Card | null;
   settings: Settings;
+  chat: ChatMessage[];
+  nextId: string;
 
   addPlayer(player: Player): void;
   removePlayer(player: Player): void;
@@ -55,6 +65,8 @@ export class Room implements RoomInterface {
   inactivityTimerInterval: NodeJS.Timeout | null = null;
   wildcard: Card | null = null;
   settings: Settings;
+  chat: ChatMessage[] = [];
+  nextId = "";
 
   constructor(host: Player, settings: Settings, id: string = "") {
     this.id = id || uuid().substr(0, 7);
@@ -88,6 +100,13 @@ export class Room implements RoomInterface {
       // create replacement bot
       const bot = this.createBot(player);
       this.addBot(bot, player);
+
+      if (this.turn === player) {
+        this.turn = bot;
+        this.turn.canPlay = true;
+        this.turn.canDraw = true;
+        this.turn.botPlay(this);
+      }
     } else {
       this.players = this.players.filter((p) => p.id !== player.id);
     }
@@ -99,14 +118,17 @@ export class Room implements RoomInterface {
     player.cards = [];
 
     // if only 1 player is left and remove is not replaced then kick last player as game cannot be played
-    if (players.length === 1 && !replace && this.started) {
+    if (this.players.length === 1 && !replace && this.started && this.host !== player && !this.winner) {
       this.removePlayer(this.host, false);
       this.host.socket?.emit("kicked");
-      console.log("kicked");
+    }
+
+    if (this.turn === player) {
+      this.nextTurn();
     }
   }
 
-  startGame() {
+  async startGame() {
     this.deck.generateDeck();
     this.deck.shuffleDeck();
 
@@ -118,6 +140,8 @@ export class Room implements RoomInterface {
 
     // give players cards
     this.players.forEach((p) => {
+      p.cards = [];
+
       for (let i = 0; i < 7; i++) {
         this.giveCard(p);
       }
@@ -125,27 +149,27 @@ export class Room implements RoomInterface {
       p.sortCards();
     });
 
-    // pick player to start
-    const randIndex = Math.floor(Math.random() * this.players.length);
-    this.turn = this.players[randIndex];
-    this.turn.findPlayableCards(this.topCard());
-    this.turn.canDraw = true;
-    this.turn.canPlay = true;
-
-    if (this.turn.bot) {
-      this.turn.botPlay(this);
-    }
-
     this.started = true;
 
     this.broadcastState();
+
+    // pick player to start (player after randIndex will actually play first)
+    const randIndex = Math.floor(Math.random() * this.players.length);
+    this.turn = this.players[randIndex];
+
+    this.nextTurn();
 
     // start inactivity timer
     this.inactivityTimerInterval = setInterval(async () => {
       this.inactivityTimer++;
 
       if (this.inactivityTimer === 300) {
-        this.players.forEach((p) => (!p.bot ? this.removePlayer(p, false) : null));
+        this.players.forEach((p) => {
+          if (p.bot) return;
+
+          this.removePlayer(p, false);
+          p.socket?.emit("kicked");
+        });
       }
     }, 1000);
   }
@@ -238,7 +262,9 @@ export class Room implements RoomInterface {
       !player.canPlay ||
       !player.cards[cardIndex] ||
       this.turn.id !== player.id ||
-      !player.cards[cardIndex].playable
+      !player.cards[cardIndex].playable ||
+      this.isRoomEmpty ||
+      this.winner
     )
       return;
 
@@ -251,15 +277,25 @@ export class Room implements RoomInterface {
     const card = player.cards[cardIndex];
     player.cards.splice(cardIndex, 1);
 
+    // check if player has won
+    this.checkForWinner();
+    if (this.winner) {
+      this.broadcastState();
+      incrementStat("gamesPlayed", 1);
+      return;
+    }
+
     // put card on pile
     this.pile.push(card);
 
     const nextPlayer = this.getNextPlayer();
     let draw = 0;
 
+    let needsUnoPunished = this.needsUnoPunished(player);
+
     switch (card.type) {
       case CardType.Plus2:
-        if (nextPlayer.cards.findIndex((c) => c.type === CardType.Plus2) !== -1) {
+        if (this.settings.stacking && nextPlayer.cards.findIndex((c) => c.type === CardType.Plus2) !== -1) {
           nextPlayer.mustStack = true;
           this.stack += 2;
         } else {
@@ -270,7 +306,7 @@ export class Room implements RoomInterface {
       case CardType.Plus4:
         incrementStat("plus4sDealt", 1);
 
-        if (nextPlayer.cards.findIndex((c) => c.type === CardType.Plus4) !== -1) {
+        if (this.settings.stacking && nextPlayer.cards.findIndex((c) => c.type === CardType.Plus4) !== -1) {
           nextPlayer.mustStack = true;
           this.stack += 4;
         } else {
@@ -281,14 +317,52 @@ export class Room implements RoomInterface {
       case CardType.Reverse:
         this.directionReversed = !this.directionReversed;
         break;
+      case CardType.None:
+        if (this.settings.seven0) {
+          if (card.number === 7 || card.number === 0) {
+            player.canPlay = false;
+            player.canDraw = false;
+            this.broadcastState();
+            await sleep(500);
+          }
+
+          if (card.number === 7) {
+            player.canPickHand = true;
+            this.broadcastState();
+
+            if (player.bot) {
+              await sleep(1200);
+              player.botSwapHands(this);
+            } else {
+              player.socket?.emit("can-pick-hand");
+              this.broadcastState();
+            }
+            return;
+          } else if (card.number === 0) {
+            const hands = this.players.map((p) => p.cards);
+
+            // swap hands in direction of play
+            for (let i = 0; i < this.players.length; i++) {
+              const index = this.directionReversed ? this.players.length - 1 - i : i;
+              let nextIndex = this.directionReversed ? index - 1 : index + 1;
+              if (nextIndex < 0) nextIndex = this.players.length - 1;
+              if (nextIndex >= this.players.length) nextIndex = 0;
+
+              this.players[nextIndex].cards = hands[index];
+
+              this.broadcastSwapHand(this.players[index], this.players[nextIndex]);
+            }
+
+            await sleep(600);
+            this.broadcastState();
+            await sleep(600);
+          }
+        }
+        break;
     }
 
     // punish player for not calling uno
-    // TODO make other players need to call out player to be punished
-    if (player.cards.length === 1 && !player.hasCalledUno) {
-      await this.drawCards(player, 2);
-    }
-    player.hasCalledUno = false;
+    await this.punishMissedUno(player, needsUnoPunished);
 
     // go to next turn
     if (
@@ -301,18 +375,53 @@ export class Room implements RoomInterface {
     }
   }
 
+  needsUnoPunished(player: Player) {
+    return player.cards.length === 1 && !player.hasCalledUno;
+  }
+
+  async punishMissedUno(player: Player, force = false) {
+    // TODO make other players need to call out player to be punished
+    if (this.needsUnoPunished(player) || force) {
+      await this.drawCards(player, 2);
+    }
+    player.hasCalledUno = false;
+  }
+
+  async swapHands(p: Player, swap: Player, seven: boolean) {
+    const h = p.cards;
+    p.cards = swap.cards;
+    swap.cards = h;
+
+    if (seven) {
+      this.broadcastSwapHand(p, swap);
+      await sleep(600);
+
+      this.broadcastState();
+      await sleep(600);
+
+      await this.punishMissedUno(p);
+      this.broadcastState();
+      await sleep(600);
+
+      this.nextTurn();
+    }
+  }
+
   clearStack() {
     this.stack = 0;
     this.players.forEach((p) => (p.mustStack = false));
   }
 
   async nextTurn(skip: boolean = false, draw: number = 0) {
+    if (this.isRoomEmpty || this.winner) return;
+
     // reset inactivity timer
     this.inactivityTimer = 0;
 
     this.turn.clearPlayableCards();
     this.turn.canDraw = false;
     this.turn.canPlay = false;
+    this.turn.canPickHand = false;
 
     if (skip || draw !== 0) {
       this.turn = this.getNextPlayer();
@@ -385,22 +494,32 @@ export class Room implements RoomInterface {
     return this.players[newIndex];
   }
 
+  getOtherPlayers(player: Player) {
+    let right;
+    let top;
+    let left;
+    switch (this.players.length) {
+      case 4:
+        left = this.getPlayerPosFromOffset(player, 3);
+      case 3:
+        top = this.getPlayerPosFromOffset(player, 2);
+      case 2:
+        right = this.getPlayerPosFromOffset(player, 1);
+        break;
+    }
+
+    return {
+      left,
+      right,
+      top,
+    };
+  }
+
   broadcastState() {
     this.players.forEach((player) => {
       if (player.bot) return;
 
-      let right;
-      let top;
-      let left;
-      switch (this.players.length) {
-        case 4:
-          left = this.getPlayerPosFromOffset(player, 3);
-        case 3:
-          top = this.getPlayerPosFromOffset(player, 2);
-        case 2:
-          right = this.getPlayerPosFromOffset(player, 1);
-          break;
-      }
+      const { left, right, top } = this.getOtherPlayers(player);
 
       const winner = this.winner ? { username: this.winner.username, id: this.winner.id } : undefined;
 
@@ -416,6 +535,7 @@ export class Room implements RoomInterface {
         playerCount: this.players.length,
         maxPlayers: this.settings.maxPlayers,
         wildcard: this.wildcard,
+        chat: this.chat,
         you: {
           ...player,
           count: player.cards.length,
@@ -431,6 +551,7 @@ export class Room implements RoomInterface {
               isBot: right.bot,
               calledUno: right.hasCalledUno,
               skip: !right.canPlay && this.turn.id === right.id,
+              canPickHand: right.canPickHand,
             }
           : undefined,
         top: top
@@ -441,6 +562,7 @@ export class Room implements RoomInterface {
               isBot: top.bot,
               calledUno: top.hasCalledUno,
               skip: !top.canPlay && this.turn.id === top.id,
+              canPickHand: top.canPickHand,
             }
           : undefined,
         left: left
@@ -451,12 +573,21 @@ export class Room implements RoomInterface {
               isBot: left.bot,
               calledUno: left.hasCalledUno,
               skip: !left.canPlay && this.turn.id === left.id,
+              canPickHand: left.canPickHand,
             }
           : undefined,
         winner,
       };
 
       player.socket?.emit("state", state);
+    });
+  }
+
+  broadcastSwapHand(player: Player, swap: Player) {
+    this.players.forEach((p) => {
+      if (p.bot) return;
+
+      p.socket?.emit("swap-hand-anim", player.id, swap.id);
     });
   }
 

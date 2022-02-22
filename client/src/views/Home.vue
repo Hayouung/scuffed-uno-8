@@ -6,12 +6,22 @@ import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
+import Chat from "../components/Chat.vue";
+// import Advert from "../components/Advert.vue";
 
 let observer;
 
 export default {
   name: "Home",
-  components: { UMenuCard, UMenuModal, UMenuInput, UMenuBtn, USettingsMenu },
+  components: {
+    UMenuCard,
+    UMenuModal,
+    UMenuInput,
+    UMenuBtn,
+    USettingsMenu,
+    Chat,
+    // Advert,
+  },
   mixins: [menuOptions],
   data() {
     return {
@@ -20,10 +30,11 @@ export default {
       createRoomSoloForm: {
         username: "You",
         settings: {
-          stacking: false,
+          stacking: true,
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
+          seven0: false,
           public: false,
           maxPlayers: 4,
         },
@@ -32,10 +43,11 @@ export default {
         username: "",
         roomCode: "",
         settings: {
-          stacking: false,
+          stacking: true,
           forcePlay: false,
           bluffing: false,
           drawToPlay: false,
+          seven0: false,
           public: false,
           maxPlayers: 4,
         },
@@ -89,18 +101,20 @@ export default {
       }
     },
     room(room) {
-      const players = ["You"];
+      const players = [room.you];
 
-      if (room.right) players.push(room.right.username);
-      if (room.top) players.push(room.top.username);
-      if (room.left) players.push(room.left.username);
+      if (room.right) players.push(room.right);
+      if (room.top) players.push(room.top);
+      if (room.left) players.push(room.left);
 
       const solo = [];
       for (let i = 0; i < players.length; i++) {
-        const username = players[i];
+        const p = players[i];
 
         solo.push({
-          action: username,
+          action: `${p.id === room.host ? "♛ " : ""}${
+            p.id === room.you.id ? "You" : p.username
+          }`,
           alwaysShowAction: true,
           graphic: require("@/assets/solo.jpg"),
           func: () => this.kickPlayer(i),
@@ -115,10 +129,8 @@ export default {
         });
       }
 
-      if (this.currentLevel === "solo") {
-        this.options.solo = solo;
-      } else {
-        this.options.onlineRoom = solo;
+      if (this.room.id) {
+        this.options[this.currentLevel] = solo;
       }
 
       if (room.started) {
@@ -208,7 +220,7 @@ export default {
       this.options[this.currentLevel + "Back"]();
     },
     copyJoinRoomLink() {
-      const link = `${window.location.origin}/?room=${this.room.id}`;
+      const link = `${window.location.origin}/?room=${encodeURI(this.room.id)}`;
       window.navigator.clipboard
         .writeText(link)
         .then(() => alert("Copied!"))
@@ -293,6 +305,17 @@ export default {
       Help improve Scuffed Uno!
     </a>
 
+    <!-- 
+    <u-menu-modal
+      style="font-size: 1.2rem"
+      v-if="$store.state.showAdApology"
+      @close="$store.state.showAdApology = false"
+    >
+      I am extremely sorry for the redirect ads, they were not intended. It
+      seems as tho the ad network I was using had been infected with malware
+      scam ads, Pog. These ads have now been removed.
+    </u-menu-modal> -->
+
     <!-- <Adsense
       class="ad ad-side"
       ins-class="ins"
@@ -320,6 +343,15 @@ export default {
     <!-- <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
     </div> -->
+
+    <a
+      class="watermark stats-link"
+      style="bottom: max(5.5vh, 1.7rem)"
+      href="https://www.play-games.com/game/29996/scuffed-uno.html"
+      target="_blank"
+    >
+      play-games.com
+    </a>
 
     <router-link class="watermark stats-link" to="/stats">
       Global Stats
@@ -371,6 +403,8 @@ export default {
       </div>
     </header>
 
+    <chat v-if="currentLevel === 'onlineRoom'" />
+
     <u-menu-modal
       v-if="showCreateRoomSoloModal"
       @close="
@@ -399,11 +433,16 @@ export default {
           class="rule"
         />
         <u-menu-input
-          v-model="createRoomSoloForm.settings.bluffing"
-          label="Bluffing"
+          v-model="createRoomSoloForm.settings.stacking"
+          label="Stacking"
           type="checkbox"
           class="rule"
-          style="opacity: 0.5; pointer-events: none"
+        />
+        <u-menu-input
+          v-model="createRoomSoloForm.settings.seven0"
+          label="7-0"
+          type="checkbox"
+          class="rule"
         />
       </div>
 
@@ -460,11 +499,16 @@ export default {
           class="rule"
         />
         <u-menu-input
-          v-model="createRoomForm.settings.bluffing"
-          label="Bluffing"
+          v-model="createRoomForm.settings.stacking"
+          label="Stacking"
           type="checkbox"
           class="rule"
-          style="opacity: 0.5; pointer-events: none"
+        />
+        <u-menu-input
+          v-model="createRoomForm.settings.seven0"
+          label="7-0"
+          type="checkbox"
+          class="rule"
         />
       </div>
 
@@ -595,6 +639,12 @@ $mobile: 900px;
   }
 }
 
+.ad-home-left {
+  @media screen and (max-height: 725px) {
+    display: none;
+  }
+}
+
 .watermark {
   color: white;
   opacity: 0.5;
@@ -702,6 +752,7 @@ img {
     display: flex;
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
 
     .rule {
       width: auto;

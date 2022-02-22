@@ -7,6 +7,9 @@ import UGameColorPicker from "@/components/Game/UGameColorPicker.vue";
 import UGamePlayerCards from "@/components/Game/UGamePlayerCards.vue";
 import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
+import Advert from "../components/Advert.vue";
+import Chat from "../components/Chat.vue";
+import UGamePickHand from "../components/Game/UGamePickHand.vue";
 
 export default {
   name: "Game",
@@ -19,6 +22,9 @@ export default {
     UGamePlayerCards,
     UMenuBtn,
     USettingsMenu,
+    Advert,
+    Chat,
+    UGamePickHand,
   },
   data() {
     return {
@@ -35,6 +41,16 @@ export default {
       turnTimerInterval: null,
       forcePlayOfDrawnCard: false,
       showKeepCard: false,
+      showBluff: false,
+      showPickHand: false,
+      swapHandAnim: false,
+      swap: {
+        right: false,
+        left: false,
+        top: false,
+        you: false,
+      },
+      isPlayAgain: false,
     };
   },
   computed: {
@@ -291,6 +307,8 @@ export default {
       );
       if (!cardElement) return;
 
+      if (this.swapHandAnim) return;
+
       if (toStack) {
         const box = cardElement.getBoundingClientRect();
         const centerX = window.innerWidth / 2;
@@ -344,6 +362,13 @@ export default {
         "play-wildcard",
         this.playerCards[index].type
       );
+    },
+    pickHand(pos) {
+      if (!this.$store.state.room[pos]) return;
+
+      const id = this.$store.state.room[pos].id;
+      this.$store.state.socket.emit("pick-hand", id);
+      this.showPickHand = false;
     },
     forcePlay() {
       if (!this.canPlayClient || !this.room.you.canPlay || this.turnTimer > 0)
@@ -446,9 +471,9 @@ export default {
 
       this.$nextTick(() => {
         this.$refs.unoAlert.style[anchor] = "4vh";
-        window.requestAnimationFrame(() => {
+        setTimeout(() => {
           this.$refs.unoAlert.style.transform = transform;
-        });
+        }, 20);
 
         setTimeout(() => {
           this.$refs.unoAlert.style.transform = "";
@@ -488,6 +513,24 @@ export default {
 
       this.showKeepCard = false;
     },
+    getPositionFromId(id) {
+      if (this.room.right && this.room.right.id === id) {
+        return "right";
+      } else if (this.room.left && this.room.left.id === id) {
+        return "left";
+      } else if (this.room.top && this.room.top.id === id) {
+        return "top";
+      } else if (this.room.you && this.room.you.id === id) {
+        return "you";
+      }
+    },
+    playAgain() {
+      this.$store.commit("RESET_ROOM");
+      this.$store.state.socket.emit("play-again");
+      this.isPlayAgain = true;
+
+      this.$router.push({ name: "Home", params: { playAgain: true } });
+    },
   },
   mounted() {
     if (!this.room.id) return this.$router.push({ name: "Home" });
@@ -499,18 +542,45 @@ export default {
       this.showKeepCard = true;
     });
 
+    this.$store.state.socket.on("can-bluff", () => {
+      this.showBluff = true;
+    });
+
+    this.$store.state.socket.on("can-pick-hand", () => {
+      this.showPickHand = true;
+    });
+
+    this.$store.state.socket.on("swap-hand-anim", (pId, sId) => {
+      this.swapHandAnim = true;
+
+      const p = this.getPositionFromId(pId);
+      const s = this.getPositionFromId(sId);
+
+      this.swap[p] = true;
+      this.swap[s] = true;
+
+      setTimeout(() => {
+        this.swapHandAnim = false;
+        this.swap[p] = false;
+        this.swap[s] = false;
+      }, 800);
+    });
+
     if (this.isTurn) {
       this.startPlayersTurn();
     }
   },
   beforeDestroy() {
-    this.leaveRoom();
+    if (!this.isPlayAgain) this.leaveRoom();
   },
   destroyed() {
     window.onblur = null;
     window.onfocus = null;
 
     this.$store.state.socket.off("can-keep-card");
+    this.$store.state.socket.off("can-bluff");
+    this.$store.state.socket.off("can-pick-hand");
+    this.$store.state.socket.off("swap-hand-anim");
   },
 };
 </script>
@@ -525,12 +595,60 @@ export default {
       <div id="gameadsbanner"></div>
     </div> -->
 
+    <chat />
+
+    <advert
+      v-if="!room.winner"
+      adSlot="8788085732"
+      :width="468"
+      :height="60"
+      class="ad-top ad-top-game"
+    />
+
+    <advert
+      v-if="room.winner"
+      adSlot="8062339187"
+      :width="970"
+      :height="90"
+      class="ad-top ad-top-win"
+    />
+
+    <!-- <advert
+      v-if="room.winner"
+      adKey="5bd0055c6997223ceecc4982f220e09a"
+      :width="468"
+      :height="60"
+      :timeout="600"
+      class="ad-top ad-top2-win"
+    /> -->
+
+    <advert
+      v-if="room.winner"
+      adSlot="6389670028"
+      :width="160"
+      :height="600"
+      class="ad-left ad-left-win"
+    />
+
+    <advert
+      v-if="room.winner"
+      adSlot="6453249207"
+      :width="300"
+      :height="600"
+      class="ad-right ad-right-win"
+    />
+
     <u-menu-modal
       v-if="room.winner"
       :title="`Congratulations to ${room.winner.username} on winning the game!`"
       hideClose
     >
-      <button class="btn rounded-btn" @click="leaveRoom">Main Menu</button>
+      <div style="display: flex; gap: 2rem">
+        <button class="btn rounded-btn success" @click="playAgain">
+          Play Again
+        </button>
+        <button class="btn rounded-btn" @click="leaveRoom">Main Menu</button>
+      </div>
     </u-menu-modal>
 
     <button class="settings-btn" @click="showSettings = !showSettings"></button>
@@ -545,6 +663,30 @@ export default {
       v-if="pickColor || (room.wildcard && !isTurn)"
       :isTurn="isTurn"
       @pick-color="wildcardColor = $event"
+    />
+
+    <u-game-pick-hand
+      v-if="showPickHand"
+      :isTurn="isTurn"
+      @pick-hand="pickHand"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.right && $store.state.room.right.canPickHand"
+      :isTurn="false"
+      class="right"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.left && $store.state.room.left.canPickHand"
+      :isTurn="false"
+      class="left"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.top && $store.state.room.top.canPickHand"
+      :isTurn="false"
+      class="top"
     />
 
     <img ref="unoAlert" class="uno-alert" src="@/assets/logo.png" alt="" />
@@ -578,7 +720,7 @@ export default {
 
     <div class="direction" :class="{ reverse: !room.directionReversed }" />
 
-    <u-game-other-cards :room="room" />
+    <u-game-other-cards :room="room" :swap="swap" />
 
     <div class="hud">
       <h1 class="stack-count" v-if="room.stack > 0">+{{ room.stack }}</h1>
@@ -614,10 +756,26 @@ export default {
         >
       </div>
 
+      <div v-if="showBluff" class="keep-card-option">
+        <u-menu-btn
+          class="keep-btn"
+          @click="
+            $store.state.socket.emit('accept-plus4');
+            showBluff = false;
+          "
+          >Accept</u-menu-btn
+        >
+        <u-menu-btn
+          class="play-btn"
+          @click="$store.state.socket.emit('challenge-plus4')"
+          >Challenge</u-menu-btn
+        >
+      </div>
+
       <div
         v-if="room.you"
         class="cards you"
-        :class="{ turn: isTurn && room.you.canPlay }"
+        :class="{ turn: isTurn && room.you.canPlay, swap: swap.you }"
         :style="{ '--count': `${room.you.count}` }"
       >
         <Card
@@ -633,7 +791,7 @@ export default {
         />
       </div>
 
-      <u-game-player-cards :room="room" :is-turn="isTurn" />
+      <u-game-player-cards :room="room" :is-turn="isTurn" :swap="swap" />
 
       <button
         v-if="room.isHost && !room.started && room.playerCount > 1"
@@ -680,6 +838,51 @@ $table-rotatex: 58deg;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  .ad-top-game {
+    left: 1vh;
+    right: unset;
+    transform: translateX(0);
+    z-index: 100;
+
+    @media screen and (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  .ad-top-win {
+    top: 8vh;
+    z-index: 10000;
+
+    @media screen and (max-height: 560px) {
+      display: none;
+    }
+  }
+
+  .ad-top2-win {
+    top: calc(8vh + 125px);
+    z-index: 10000;
+
+    @media screen and (max-height: 765px) {
+      display: none;
+    }
+  }
+
+  .ad-left-win {
+    z-index: 10000;
+
+    @media screen and (max-width: 1180px) {
+      display: none;
+    }
+  }
+
+  .ad-right-win {
+    z-index: 10000;
+
+    @media screen and (max-width: 1420px) {
+      display: none;
+    }
+  }
 }
 
 .animation-cards {
@@ -714,6 +917,14 @@ $table-rotatex: 58deg;
 
   &:hover {
     background-color: #ff8e0d;
+  }
+
+  &.success {
+    background-color: #0cb40c;
+
+    &:hover {
+      background-color: #1fc91f;
+    }
   }
 }
 
@@ -939,6 +1150,16 @@ $table-rotatex: 58deg;
   flex-direction: row;
   margin-bottom: 50px;
   margin-top: auto;
+
+  &.swap {
+    .card {
+      margin-left: -127px !important;
+
+      @media screen and (max-width: $mobile) {
+        margin-left: -63.5px !important;
+      }
+    }
+  }
 
   &.you {
     transition: transform 0.5s ease, filter 0.5s ease;

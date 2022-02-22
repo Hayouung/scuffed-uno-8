@@ -21,6 +21,7 @@ export default class Deck {
     colors.forEach((color) => {
       // create 0
       this.cards.push(new Card(0, color, CardType.None));
+      // this.cards.push(new Card(7, color, CardType.None));
 
       // create 2 of each number 1 to 9
       for (let number = 1; number <= 9; number++) {

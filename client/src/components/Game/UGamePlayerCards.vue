@@ -14,6 +14,12 @@ export default {
       },
     },
     isTurn: Boolean,
+    swap: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
   },
 };
 </script>
@@ -23,28 +29,40 @@ export default {
     <div
       v-if="room.you && room.started"
       class="player-card you"
-      :class="{ playing: isTurn, skip: room.you.skip }"
+      :class="{ playing: isTurn, skip: room.you.skip, swap: swap.you }"
     >
       {{ room.you.username }} : {{ room.you.count }}
     </div>
     <div
       v-if="room.right && room.started"
       class="player-card right"
-      :class="{ playing: room.turn === room.right.id, skip: room.right.skip }"
+      :class="{
+        playing: room.turn === room.right.id,
+        skip: room.right.skip,
+        swap: swap.right,
+      }"
     >
       {{ room.right.username }} : {{ room.right.count }}
     </div>
     <div
       v-if="room.left && room.started"
       class="player-card left"
-      :class="{ playing: room.turn === room.left.id, skip: room.left.skip }"
+      :class="{
+        playing: room.turn === room.left.id,
+        skip: room.left.skip,
+        swap: swap.left,
+      }"
     >
       {{ room.left.username }} : {{ room.left.count }}
     </div>
     <div
       v-if="room.top && room.started"
       class="player-card top"
-      :class="{ playing: room.turn === room.top.id, skip: room.top.skip }"
+      :class="{
+        playing: room.turn === room.top.id,
+        skip: room.top.skip,
+        swap: swap.top,
+      }"
     >
       {{ room.top.username }} : {{ room.top.count }}
     </div>
@@ -90,6 +108,27 @@ $mobile: 900px;
 
       to {
         box-shadow: 0px 0px 0px 0px #ff0000;
+      }
+    }
+  }
+
+  &.swap {
+    animation: swap 2s ease;
+    animation-fill-mode: forwards;
+
+    @keyframes swap {
+      from {
+        box-shadow: 0px 0px 5px 5px #006eff;
+      }
+
+      50% {
+        box-shadow: 0px 0px 20px 14px #006eff;
+        color: #0056a7;
+        border-color: #0056a7;
+      }
+
+      to {
+        box-shadow: 0px 0px 0px 0px #006eff;
       }
     }
   }

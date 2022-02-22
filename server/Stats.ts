@@ -103,6 +103,8 @@ const decrementPickedColors = (color: "red" | "blue" | "green" | "yellow", dec: 
 // update stats github gist
 
 setInterval(async () => {
+  if (process.env.NODE_ENV !== "production") return;
+
   const cloud = await fetchStats();
   if (cloud.lobbiesOnline === undefined) return console.log("Empty cloud");
 
