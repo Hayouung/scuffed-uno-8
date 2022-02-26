@@ -19,17 +19,18 @@
     </div>
 
     <div
-      v-if="$store.state.isMobile && !$store.state.isLandscape"
+      v-if="
+        $store.state.isMobile &&
+        !$store.state.isLandscape &&
+        showLandscapeBanner
+      "
       class="banner landscape-alert"
     >
       <p>
         It is recommended to play Scuffed Uno in landscape mode for the best
         possible experience.
       </p>
-      <button
-        class="close-btn"
-        @click="$store.commit('SET_IS_LANDSCAPE', true)"
-      >
+      <button class="close-btn" @click="showLandscapeBanner = false">
         <div></div>
         <div></div>
       </button>
@@ -48,6 +49,7 @@ export default {
   data() {
     return {
       refresh: false,
+      showLandscapeBanner: true,
     };
   },
   computed: {

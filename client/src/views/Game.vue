@@ -602,6 +602,7 @@ export default {
       adSlot="8788085732"
       :width="468"
       :height="60"
+      :viewWidth="900"
       class="ad-top ad-top-game"
     />
 
@@ -610,6 +611,8 @@ export default {
       adSlot="8062339187"
       :width="970"
       :height="90"
+      :viewHeight="560"
+      :viewWidth="740"
       class="ad-top ad-top-win"
     />
 
@@ -627,6 +630,7 @@ export default {
       adSlot="6389670028"
       :width="160"
       :height="600"
+      :viewWidth="1180"
       class="ad-left ad-left-win"
     />
 
@@ -635,6 +639,7 @@ export default {
       adSlot="6453249207"
       :width="300"
       :height="600"
+      :viewWidth="1420"
       class="ad-right ad-right-win"
     />
 

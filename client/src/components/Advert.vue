@@ -25,10 +25,23 @@ export default {
       type: Number,
       default: 0,
     },
+    viewWidth: {
+      type: Number,
+      default: 0,
+    },
+    viewHeight: {
+      type: Number,
+      default: 0,
+    },
   },
   mounted() {
     const ad = this.$refs.ad;
-    if (!ad) return;
+    if (
+      !ad ||
+      window.innerWidth < this.viewWidth ||
+      window.innerHeight < this.viewHeight
+    )
+      return;
 
     const conf = document.createElement("script");
     conf.innerHTML = `(adsbygoogle = window.adsbygoogle || []).push({});`;

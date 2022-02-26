@@ -7,7 +7,7 @@ import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
 import Chat from "../components/Chat.vue";
-// import Advert from "../components/Advert.vue";
+import Advert from "../components/Advert.vue";
 
 let observer;
 
@@ -20,7 +20,7 @@ export default {
     UMenuBtn,
     USettingsMenu,
     Chat,
-    // Advert,
+    Advert,
   },
   mixins: [menuOptions],
   data() {
@@ -356,6 +356,15 @@ export default {
       :height="600"
       class="ad-left ad-home-left"
     /> -->
+
+    <advert
+      adSlot="2925781749"
+      :width="160"
+      :height="600"
+      :viewHeight="725"
+      :viewWidth="730"
+      class="ad-left ad-home-left"
+    />
 
     <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
