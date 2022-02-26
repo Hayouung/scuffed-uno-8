@@ -609,11 +609,11 @@ export default {
     <advert
       v-if="room.winner"
       adSlot="8062339187"
-      :width="970"
-      :height="90"
-      :viewHeight="560"
-      :viewWidth="740"
-      class="ad-top ad-top-win"
+      :width="336"
+      :height="280"
+      :viewHeight="810"
+      :viewWidth="340"
+      class="ad-top-win"
     />
 
     <!-- <advert
@@ -856,10 +856,14 @@ $table-rotatex: 58deg;
   }
 
   .ad-top-win {
-    top: 8vh;
+    top: 1vh;
     z-index: 10000;
 
-    @media screen and (max-height: 560px) {
+    @media screen and (max-height: 810px) {
+      display: none;
+    }
+
+    @media screen and (max-width: 340px) {
       display: none;
     }
   }
