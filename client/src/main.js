@@ -15,11 +15,17 @@ Vue.use(SimpleAnalytics, {
   domain: "api.scuffeduno.online",
 });
 
-Vue.use(VueGtag, {
-  config: {
-    id: "G-GFV5FXX1BW",
+Vue.use(
+  VueGtag,
+  {
+    config: {
+      id: "G-GFV5FXX1BW",
+    },
+    // appName: "Scuffed Uno",
+    // pageTrackerScreenviewEnabled: true,
   },
-});
+  router
+);
 
 // Vue.use(require("vue-script2"));
 // Vue.use(Ads.Adsense);
