@@ -268,6 +268,11 @@ export default {
     }
 
     this.gameAdsInterval = setInterval(() => {
+      const scripts = Array.from(document.getElementsByTagName("script"));
+      scripts.forEach((s) => {
+        if (s.src.includes("https://n.gameads.io/getcode?")) s.remove();
+      });
+
       if (window.innerWidth >= 900) {
         window.GameAdsRenew("gameadsbanner");
       }

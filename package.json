@@ -29,6 +29,7 @@
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
     "vue-google-adsense": "^1.10.1",
+    "vue-gtag": "1",
     "vue-router": "^3.5.1",
     "vue-script2": "^2.1.0",
     "vuex": "^3.4.0"
