@@ -637,9 +637,9 @@ export default {
     <advert
       v-if="room.winner"
       adSlot="6453249207"
-      :width="300"
-      :height="600"
-      :viewWidth="1420"
+      :width="250"
+      :height="250"
+      :viewWidth="1350"
       class="ad-right ad-right-win"
     />
 
@@ -888,7 +888,7 @@ $table-rotatex: 58deg;
   .ad-right-win {
     z-index: 10000;
 
-    @media screen and (max-width: 1420px) {
+    @media screen and (max-width: 1360px) {
       display: none;
     }
   }

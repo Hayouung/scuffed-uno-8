@@ -55,11 +55,8 @@ export default {
       this.adtest = "on";
     }
 
-    setTimeout(() => {
-      if (!ad) return;
-      ad.appendChild(conf);
-      ad.appendChild(script);
-    }, this.timeout);
+    ad.appendChild(conf);
+    ad.appendChild(script);
   },
 };
 </script>

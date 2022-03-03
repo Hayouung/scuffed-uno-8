@@ -42,6 +42,8 @@ const store = new Vuex.Store({
     isOffline: !navigator.onLine,
     windowWidth: 1920,
     windowHeight: 1080,
+    windowWidthInitial: window.innerWidth,
+    windowHeightInitial: window.innerHeight,
     socket: null,
     animateCards: [],
     room: { ...defaultRoom },

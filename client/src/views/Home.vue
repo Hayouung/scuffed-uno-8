@@ -358,6 +358,17 @@ export default {
     /> -->
 
     <advert
+      v-if="$store.state.windowWidth >= 1680"
+      adSlot="9162945082"
+      :width="300"
+      :height="600"
+      :viewHeight="725"
+      :viewWidth="1680"
+      class="ad-left ad-home-left ad-home-left-wide"
+    />
+
+    <advert
+      v-else
       adSlot="2925781749"
       :width="160"
       :height="600"
@@ -683,6 +694,16 @@ $mobile: 900px;
   @media screen and (max-height: 725px) {
     display: none;
   }
+
+  &-wide {
+    @media screen and (max-width: 1680px) {
+      display: none;
+    }
+  }
+}
+
+.ad-home-right {
+  display: block !important;
 }
 
 .watermark {
