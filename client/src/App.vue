@@ -116,7 +116,7 @@ body {
 
 #app {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background: radial-gradient(
     circle,
     rgb(192, 34, 26) 0%,
