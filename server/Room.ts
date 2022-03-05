@@ -9,6 +9,7 @@ export interface Settings {
   forcePlay: boolean;
   bluffing: boolean;
   drawToPlay: boolean;
+  jumpIn: boolean;
   seven0: boolean;
   public: boolean;
   maxPlayers: number;
@@ -21,35 +22,7 @@ export interface ChatMessage {
   time: number;
 }
 
-interface RoomInterface {
-  id: string;
-  started: boolean;
-  host: Player;
-  players: Player[];
-  deck: Deck;
-  pile: Card[];
-  turn: Player;
-  directionReversed: boolean;
-  stack: number;
-  winner: Player | null;
-  isRoomEmpty: boolean;
-  inactivityTimer: number;
-  inactivityTimerInterval: NodeJS.Timeout | null;
-  wildcard: Card | null;
-  settings: Settings;
-  chat: ChatMessage[];
-  nextId: string;
-
-  addPlayer(player: Player): void;
-  removePlayer(player: Player): void;
-  startGame(): void;
-  giveCard(player: Player): Card;
-  playCard(player: Player, cardIndex: number): void;
-  getNextPlayer(): Player;
-  refillDeckFromPile(): void;
-}
-
-export class Room implements RoomInterface {
+export class Room {
   id = "";
   started: boolean = false;
   host: Player;
@@ -67,6 +40,7 @@ export class Room implements RoomInterface {
   settings: Settings;
   chat: ChatMessage[] = [];
   nextId = "";
+  awaitingJumpIn = false;
 
   constructor(host: Player, settings: Settings, id: string = "") {
     this.id = id || uuid().substr(0, 7);
@@ -261,12 +235,24 @@ export class Room implements RoomInterface {
     if (
       !player.canPlay ||
       !player.cards[cardIndex] ||
-      this.turn.id !== player.id ||
+      (this.turn.id !== player.id && !(this.awaitingJumpIn && player.canJumpIn)) ||
       !player.cards[cardIndex].playable ||
       this.isRoomEmpty ||
       this.winner
     )
       return;
+
+    if (this.awaitingJumpIn) {
+      this.clearJumpIns();
+      this.broadcastState();
+    }
+
+    // prevent anyone else from playing while we perform this card play
+    this.players.forEach((p) => {
+      if (p === player) return;
+
+      p.canPlay = false;
+    });
 
     incrementStat("cardsPlayed", 1);
 
@@ -277,6 +263,14 @@ export class Room implements RoomInterface {
     const card = player.cards[cardIndex];
     player.cards.splice(cardIndex, 1);
 
+    // put card on pile
+    this.pile.push(card);
+    this.broadcastState();
+    await sleep(500);
+
+    // change turn to player to account for jump in plays
+    this.turn = player;
+
     // check if player has won
     this.checkForWinner();
     if (this.winner) {
@@ -284,9 +278,6 @@ export class Room implements RoomInterface {
       incrementStat("gamesPlayed", 1);
       return;
     }
-
-    // put card on pile
-    this.pile.push(card);
 
     const nextPlayer = this.getNextPlayer();
     let draw = 0;
@@ -364,6 +355,20 @@ export class Room implements RoomInterface {
     // punish player for not calling uno
     await this.punishMissedUno(player, needsUnoPunished);
 
+    // check jump ins
+    if (this.settings.jumpIn) {
+      await this.checkJumpIns();
+
+      if (this.awaitingJumpIn && this.turn.id === player.id) {
+        // a player could have jumped in but didn't
+        this.clearJumpIns();
+        this.broadcastState();
+      } else if (this.turn.id !== player.id) {
+        // a player jumped in
+        return;
+      }
+    }
+
     // go to next turn
     if (
       ((card.type === CardType.Plus2 || card.type === CardType.Plus4) && !nextPlayer.mustStack) ||
@@ -385,6 +390,48 @@ export class Room implements RoomInterface {
       await this.drawCards(player, 2);
     }
     player.hasCalledUno = false;
+  }
+
+  async checkJumpIns() {
+    const tc = this.topCard();
+    this.awaitingJumpIn = false;
+
+    for (const p of this.players) {
+      p.clearPlayableCards();
+      p.canJumpIn = false;
+
+      for (const c of p.cards) {
+        let playable = false;
+        if (c.type === CardType.None && c.color === tc.color && c.number === tc.number) playable = true;
+        else if (c.type !== CardType.None && c.color === tc.color && c.type === tc.type) playable = true;
+        // else if ((c.type === CardType.Wildcard || c.type === CardType.Plus4) && c.type === tc.type)
+        //   playable = true;
+        // TODO implement jump in for wildcards
+
+        if (playable) {
+          c.playable = true;
+          this.awaitingJumpIn = true;
+          p.canJumpIn = true;
+          p.canPlay = true;
+        }
+      }
+
+      // if (p.bot && p.canJumpIn && Math.random() > 0.25) {
+      //   setTimeout(() => {
+      //     p.botPlay(this);
+      //   }, 1500);
+      // }
+    }
+
+    if (this.awaitingJumpIn) {
+      this.broadcastState();
+      await sleep(2000);
+    }
+  }
+
+  clearJumpIns() {
+    this.awaitingJumpIn = false;
+    this.players.forEach((p) => (p.canJumpIn = false));
   }
 
   async swapHands(p: Player, swap: Player, seven: boolean) {
@@ -536,6 +583,7 @@ export class Room implements RoomInterface {
         maxPlayers: this.settings.maxPlayers,
         wildcard: this.wildcard,
         chat: this.chat,
+        awaitingJumpIn: this.awaitingJumpIn,
         you: {
           ...player,
           count: player.cards.length,

@@ -31,6 +31,7 @@ const defaultSettings: Settings = {
   forcePlay: false,
   drawToPlay: false,
   bluffing: false,
+  jumpIn: false,
   seven0: false,
 };
 
@@ -50,6 +51,7 @@ const validateSettings = (settings: any): Settings | false => {
     { key: "forcePlay", type: "boolean" },
     { key: "drawToPlay", type: "boolean" },
     { key: "bluffing", type: "boolean" },
+    { key: "jumpIn", type: "boolean" },
     { key: "seven0", type: "boolean" },
   ];
 
@@ -240,7 +242,12 @@ export default function(socket: Socket) {
     if (!player.inRoom) return;
 
     const room = rooms[player.roomId];
-    if (!room.started || room.turn.id !== player.id || !player.cards[index]) return;
+    if (
+      !room.started ||
+      (room.turn.id !== player.id && !(room.awaitingJumpIn && player.canJumpIn)) ||
+      !player.cards[index]
+    )
+      return;
 
     const card = player.cards[index];
     if (card.type === CardType.Plus4 || card.type === CardType.Wildcard) {

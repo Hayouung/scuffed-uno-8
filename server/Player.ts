@@ -4,27 +4,7 @@ import { Card, CardColor, CardType } from "./Card";
 import { Room } from "./Room";
 import { incrementPickedColors } from "./Stats";
 
-interface PlayerInterface {
-  id: string;
-  socket: Socket | null;
-  bot: boolean;
-  inRoom: boolean;
-  roomId: string;
-  cards: Card[];
-  mustStack: boolean;
-  hasCalledUno: boolean;
-  lastDrawnCard: number;
-  canDraw: boolean;
-  drawing: boolean;
-  canPlay: boolean;
-  canPickHand: boolean;
-
-  sortCards(): void;
-  findPlayableCards(topCard: Card): void;
-  clearPlayableCards(): void;
-  botPlay(room: Room): void;
-}
-export default class Player implements PlayerInterface {
+export default class Player {
   id = "";
   socket;
 
@@ -40,6 +20,7 @@ export default class Player implements PlayerInterface {
   drawing = false;
   canPlay = false;
   canPickHand = false;
+  canJumpIn = false;
 
   constructor(socket: Socket | null, bot: boolean = false) {
     this.bot = bot;

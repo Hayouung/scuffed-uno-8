@@ -101,7 +101,7 @@ export default {
       return count;
     },
     isTurn() {
-      return this.room.turn === this.room.you.id;
+      return this.room.turn === this.room.you.id || this.room.you.canJumpIn;
     },
     // currentPlayer() {
     //   for (const p of ["you", "left", "right", "top"]) {
@@ -206,6 +206,16 @@ export default {
     },
     room(room, oldRoom) {
       if (room.id === "") return this.$router.push({ name: "Home" });
+
+      if (this.isTurn && room.you.canJumpIn && !this.canPlayClient)
+        this.startPlayersTurn();
+
+      // console.log(
+      //   this.isTurn,
+      //   room.you.canJumpIn,
+      //   this.canPlayClient,
+      //   this.isTurn && room.you.canJumpIn && !this.canPlayClient
+      // );
 
       if (room.you.count === 2 && this.hasCalledUnoClient)
         this.hasCalledUnoClient = false;
@@ -487,7 +497,12 @@ export default {
 
       // start turn timer if player is not being skipped
       if (this.room.you.canPlay) {
-        this.turnTimer = 20;
+        if (this.turnTimerInterval) {
+          clearInterval(this.turnTimerInterval);
+        }
+
+        this.turnTimer =
+          this.room.you.canJumpIn || this.room.awaitingJumpIn ? 2 : 20;
         this.turnTimerInterval = setInterval(() => {
           if (this.drawing) return;
 
@@ -496,6 +511,8 @@ export default {
           if (this.turnTimer === 0) {
             this.turnTimer = null;
             clearInterval(this.turnTimerInterval);
+
+            if (this.room.you.canJumpIn || this.room.awaitingJumpIn) return;
             this.forcePlay();
           }
         }, 1000);
@@ -780,7 +797,13 @@ export default {
       <div
         v-if="room.you"
         class="cards you"
-        :class="{ turn: isTurn && room.you.canPlay, swap: swap.you }"
+        :class="{
+          turn:
+            isTurn &&
+            room.you.canPlay &&
+            !(room.awaitingJumpIn && !room.you.canJumpIn),
+          swap: swap.you,
+        }"
         :style="{ '--count': `${room.you.count}` }"
       >
         <Card
@@ -790,7 +813,12 @@ export default {
           :color="card.color"
           :number="card.number"
           :type="card.type"
-          :playable="card.playable && isTurn && !drawing && room.you.canPlay"
+          :playable="
+            card.playable &&
+            (isTurn || room.you.canJumpIn) &&
+            !drawing &&
+            room.you.canPlay
+          "
           @card-played="playCard"
           @pick-color="pickWildcardColor"
         />

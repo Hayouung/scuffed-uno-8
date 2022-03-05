@@ -35,6 +35,7 @@ export default {
           bluffing: false,
           drawToPlay: false,
           seven0: false,
+          jumpIn: false,
           public: false,
           maxPlayers: 4,
         },
@@ -48,6 +49,7 @@ export default {
           bluffing: false,
           drawToPlay: false,
           seven0: false,
+          jumpIn: false,
           public: false,
           maxPlayers: 4,
         },
@@ -495,6 +497,12 @@ export default {
           class="rule"
         />
         <u-menu-input
+          v-model="createRoomSoloForm.settings.jumpIn"
+          label="Jump In"
+          type="checkbox"
+          class="rule"
+        />
+        <u-menu-input
           v-model="createRoomSoloForm.settings.seven0"
           label="7-0"
           type="checkbox"
@@ -557,6 +565,12 @@ export default {
         <u-menu-input
           v-model="createRoomForm.settings.stacking"
           label="Stacking"
+          type="checkbox"
+          class="rule"
+        />
+        <u-menu-input
+          v-model="createRoomForm.settings.jumpIn"
+          label="Jump In"
           type="checkbox"
           class="rule"
         />
