@@ -615,12 +615,12 @@ export default {
     <chat />
 
     <advert
-      v-if="!room.winner"
       adSlot="8788085732"
       :width="468"
       :height="60"
       :viewWidth="900"
       class="ad-top ad-top-game"
+      :class="{ win: room.winner }"
     />
 
     <advert
@@ -877,6 +877,10 @@ $table-rotatex: 58deg;
     right: unset;
     transform: translateX(0);
     z-index: 100;
+
+    &.win {
+      z-index: 10000;
+    }
 
     @media screen and (max-width: 900px) {
       display: none;
