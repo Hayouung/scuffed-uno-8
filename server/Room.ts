@@ -41,6 +41,7 @@ export class Room {
   chat: ChatMessage[] = [];
   nextId = "";
   awaitingJumpIn = false;
+  jumpInTime = 0;
 
   constructor(host: Player, settings: Settings, id: string = "") {
     this.id = id || uuid().substr(0, 7);
@@ -243,7 +244,11 @@ export class Room {
       return;
 
     if (this.awaitingJumpIn) {
+      console.log("play jump in card", this.jumpInTime);
+
       this.clearJumpIns();
+      this.stack = 0;
+
       this.broadcastState();
     }
 
@@ -357,14 +362,17 @@ export class Room {
 
     // check jump ins
     if (this.settings.jumpIn) {
-      await this.checkJumpIns();
+      console.log("checking jump ins");
+      const time = await this.checkJumpIns();
 
-      if (this.awaitingJumpIn && this.turn.id === player.id) {
+      if (this.awaitingJumpIn && time === this.jumpInTime) {
+        console.log("no jump in", this.jumpInTime);
         // a player could have jumped in but didn't
         this.clearJumpIns();
         this.broadcastState();
-      } else if (this.turn.id !== player.id) {
+      } else if (time !== -1) {
         // a player jumped in
+        console.log("player jumped in", time);
         return;
       }
     }
@@ -416,21 +424,27 @@ export class Room {
         }
       }
 
-      // if (p.bot && p.canJumpIn && Math.random() > 0.25) {
-      //   setTimeout(() => {
-      //     p.botPlay(this);
-      //   }, 1500);
-      // }
+      if (p.bot && p.canJumpIn && Math.random() > 0.25) {
+        p.botPlay(this);
+      }
     }
 
     if (this.awaitingJumpIn) {
+      const time = performance.now();
+      this.jumpInTime = time;
+
       this.broadcastState();
+      console.log("waiting for jump ins");
       await sleep(2000);
+      return time;
     }
+
+    return -1;
   }
 
   clearJumpIns() {
     this.awaitingJumpIn = false;
+    this.jumpInTime = 0;
     this.players.forEach((p) => (p.canJumpIn = false));
   }
 
@@ -462,6 +476,8 @@ export class Room {
   async nextTurn(skip: boolean = false, draw: number = 0) {
     if (this.isRoomEmpty || this.winner) return;
 
+    console.log("next turn");
+
     // reset inactivity timer
     this.inactivityTimer = 0;
 
@@ -478,6 +494,8 @@ export class Room {
       this.broadcastState();
       await sleep(1500);
 
+      console.log(this.turn.username);
+
       if (draw !== 0) {
         await this.drawCards(this.turn, draw);
       }
@@ -487,6 +505,8 @@ export class Room {
     // so here next player acts as skip otherwise, just regular increment of next player
     this.turn = this.getNextPlayer();
     if (!this.turn) return;
+
+    console.log(this.turn.username);
 
     this.turn.canDraw = true;
     this.turn.canPlay = true;

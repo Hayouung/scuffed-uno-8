@@ -748,6 +748,13 @@ export default {
 
     <div class="hud">
       <h1 class="stack-count" v-if="room.stack > 0">+{{ room.stack }}</h1>
+      <h1
+        class="stack-count"
+        style="transform: scale(0.7)"
+        v-if="room.you.canJumpIn"
+      >
+        Jump In
+      </h1>
       <div
         class="turn-timer"
         v-if="turnTimer !== null && room.you.canPlay && canPlayClient"

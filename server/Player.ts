@@ -84,7 +84,11 @@ export default class Player {
   botPlay(room: Room) {
     setTimeout(async () => {
       if (!this.cards) return;
-      if (this.cards.findIndex((c) => c.playable) === -1) await room.drawCards(this);
+      if (this.cards.findIndex((c) => c.playable) === -1) {
+        if (!this.canDraw) return;
+
+        await room.drawCards(this);
+      }
 
       const playableCards = this.cards.filter((c) => c.playable);
       if (room.turn.id !== this.id || playableCards.length === 0) return;

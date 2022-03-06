@@ -217,10 +217,14 @@ export default function(socket: Socket) {
   });
 
   socket.on("call-uno", () => {
+    if (!player.inRoom) return;
+
+    const room = rooms[player.roomId];
+
     if (
-      !player.inRoom ||
-      !rooms[player.roomId].started ||
-      rooms[player.roomId].turn.id !== player.id ||
+      !room ||
+      !room.started ||
+      (room.turn.id !== player.id && !(room.awaitingJumpIn && player.canJumpIn)) ||
       player.cards.length !== 2
     )
       return;
@@ -243,6 +247,7 @@ export default function(socket: Socket) {
 
     const room = rooms[player.roomId];
     if (
+      !room ||
       !room.started ||
       (room.turn.id !== player.id && !(room.awaitingJumpIn && player.canJumpIn)) ||
       !player.cards[index]
