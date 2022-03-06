@@ -423,7 +423,10 @@ export default {
       this.$store.state.socket.emit("leave-room");
       this.$store.commit("RESET_ROOM");
 
-      if (this.$route.name !== "Home") this.$router.push({ name: "Home" });
+      if (this.$route.name !== "Home") {
+        // this.$router.push({ name: "Home", });
+        window.location.replace("/");
+      }
     },
     drawCard() {
       if (

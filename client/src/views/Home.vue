@@ -283,6 +283,27 @@ export default {
     if (this.$route.params.playAgain) {
       this.currentLevel = "onlineRoom";
     }
+
+    // request anchor ads
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${this.$store.state.adClient}`;
+    script.id = "anchor-ads-script";
+
+    document.body.appendChild(script);
+  },
+  beforeDestroy() {
+    const script = document.getElementById("anchor-ads-script");
+    if (script) script.remove();
+
+    // destroy anchor ads
+    const ads = Array.from(document.querySelectorAll(".adsbygoogle"));
+    ads.forEach((a) => {
+      if (!a.parentElement.classList.contains("ad")) {
+        a.remove();
+      }
+    });
   },
   destroyed() {
     clearInterval(this.gameAdsInterval);
