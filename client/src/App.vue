@@ -6,7 +6,10 @@
       <div class="message">You are currently offline and cannot play.</div>
     </div>
 
-    <div v-else-if="!$store.state.isConnected" class="connecting">
+    <div
+      v-else-if="!$store.state.isConnected || this.$store.state.reloading"
+      class="connecting"
+    >
       <div class="loading">
         <card back />
         <card back />

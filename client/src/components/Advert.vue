@@ -39,7 +39,8 @@ export default {
     if (
       !ad ||
       window.innerWidth < this.viewWidth ||
-      window.innerHeight < this.viewHeight
+      window.innerHeight < this.viewHeight ||
+      this.$store.state.reloading
     )
       return;
 

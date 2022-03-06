@@ -51,6 +51,7 @@ const store = new Vuex.Store({
     kicked: false,
     showAdApology: false,
     adClient: "ca-pub-2444394876892971",
+    reloading: false,
   },
   mutations: {
     SET_WINDOW_DIMENSIONS(state, { width, height }) {

@@ -265,7 +265,7 @@ export default {
       this.fetchingPublicRooms = false;
     });
 
-    if (window.innerWidth >= 900) {
+    if (window.innerWidth >= 900 && !this.$store.state.reloading) {
       window.GameAdsRenew("gameadsbanner");
     }
 
@@ -275,7 +275,7 @@ export default {
         if (s.src.includes("https://n.gameads.io/getcode?")) s.remove();
       });
 
-      if (window.innerWidth >= 900) {
+      if (window.innerWidth >= 900 && !this.$store.state.reloading) {
         window.GameAdsRenew("gameadsbanner");
       }
     }, 17000);
@@ -291,7 +291,7 @@ export default {
     script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${this.$store.state.adClient}`;
     script.id = "anchor-ads-script";
 
-    document.body.appendChild(script);
+    if (!this.$store.state.reloading) document.body.appendChild(script);
   },
   beforeDestroy() {
     const script = document.getElementById("anchor-ads-script");
@@ -315,7 +315,7 @@ export default {
 </script>
 
 <template>
-  <section class="home">
+  <section class="home" v-if="!$store.state.reloading">
     <a
       class="watermark"
       href="https://freddienelson.co.uk"
