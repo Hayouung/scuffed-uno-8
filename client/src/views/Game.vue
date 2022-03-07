@@ -617,6 +617,7 @@ export default {
     <chat />
 
     <advert
+      v-if="!room.winner"
       adSlot="8788085732"
       :width="468"
       :height="60"
