@@ -3,7 +3,7 @@ import io from "socket.io-client";
 const SERVER_URL =
   process.env.NODE_ENV === "development"
     ? `http://${window.location.hostname}:3000`
-    : "https://uno-freddie.herokuapp.com/";
+    : "http://server.scuffeduno.online";
 
 const socket = io(SERVER_URL);
 store.commit("SET_SOCKET", socket);
