@@ -1,6 +1,6 @@
 import { Octokit } from "octokit";
 
-const token = process.env.NODE_ENV === "production" ? process.env.GITHUB_TOKEN : require("../githubToken");
+const token = require("../githubToken");
 
 const gist_id = "3fbffb9c94575acd9aac4d1c58b8b8d0";
 
