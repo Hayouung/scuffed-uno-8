@@ -1,4 +1,6 @@
 import { v4 as uuid } from "uuid";
+import { performance } from "perf_hooks";
+
 import { Card, CardColor, CardType } from "./Card";
 import Deck from "./Deck";
 import Player from "./Player";
@@ -244,7 +246,7 @@ export class Room {
       return;
 
     if (this.awaitingJumpIn) {
-      console.log("play jump in card", this.jumpInTime);
+      // console.log("play jump in card", this.jumpInTime);
 
       this.clearJumpIns();
       this.stack = 0;
@@ -362,17 +364,17 @@ export class Room {
 
     // check jump ins
     if (this.settings.jumpIn) {
-      console.log("checking jump ins");
+      // console.log("checking jump ins");
       const time = await this.checkJumpIns();
 
       if (this.awaitingJumpIn && time === this.jumpInTime) {
-        console.log("no jump in", this.jumpInTime);
+        // console.log("no jump in", this.jumpInTime);
         // a player could have jumped in but didn't
         this.clearJumpIns();
         this.broadcastState();
       } else if (time !== -1) {
         // a player jumped in
-        console.log("player jumped in", time);
+        // console.log("player jumped in", time);
         return;
       }
     }
@@ -434,7 +436,7 @@ export class Room {
       this.jumpInTime = time;
 
       this.broadcastState();
-      console.log("waiting for jump ins");
+      // console.log("waiting for jump ins");
       await sleep(2000);
       return time;
     }
@@ -476,7 +478,7 @@ export class Room {
   async nextTurn(skip: boolean = false, draw: number = 0) {
     if (this.isRoomEmpty || this.winner) return;
 
-    console.log("next turn");
+    // console.log("next turn");
 
     // reset inactivity timer
     this.inactivityTimer = 0;
@@ -494,7 +496,7 @@ export class Room {
       this.broadcastState();
       await sleep(1500);
 
-      console.log(this.turn.username);
+      // console.log(this.turn.username);
 
       if (draw !== 0) {
         await this.drawCards(this.turn, draw);
@@ -506,7 +508,7 @@ export class Room {
     this.turn = this.getNextPlayer();
     if (!this.turn) return;
 
-    console.log(this.turn.username);
+    // console.log(this.turn.username);
 
     this.turn.canDraw = true;
     this.turn.canPlay = true;
