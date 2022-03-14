@@ -321,7 +321,6 @@ export default function(socket: Socket) {
     if (!player.inRoom || m.id !== player.id) return;
     if (m.text.length === 0 || m.text.length > 300) return;
     if (m.username.length < 2 || m.username.length > 11) return;
-    if (m.time < 0) return;
 
     try {
       const remainingMessages = await messageLimiter.removeTokens(1);
@@ -330,6 +329,7 @@ export default function(socket: Socket) {
     }
 
     m.text = filter.clean(m.text);
+    m.time = Date.now();
 
     const room = rooms[player.roomId];
     room.chat.push(m);
