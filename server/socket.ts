@@ -321,7 +321,7 @@ export default function(socket: Socket) {
     if (!player.inRoom || m.id !== player.id) return;
     if (m.text.length === 0 || m.text.length > 300) return;
     if (m.username.length < 2 || m.username.length > 11) return;
-    if (m.time < 0 || m.time > Date.now() + 60000) return;
+    if (m.time < 0) return;
 
     try {
       const remainingMessages = await messageLimiter.removeTokens(1);
