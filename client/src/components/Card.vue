@@ -114,7 +114,7 @@ export default {
 
       // this.$refs.card.style.marginLeft = `-${box.width}px`;
       // this.$refs.card.style.opacity = "0";
-      // this.$refs.card.classList.add("hidden");
+      this.$refs.card.classList.add("hidden");
 
       this.$emit("card-played", this.index);
     },
@@ -217,9 +217,7 @@ export default {
             if (card.draw && card.player)
               document
                 .querySelector(
-                  `.cards.you :nth-of-type(${
-                    this.$store.state.room.you.lastDrawnCard + 1
-                  })`
+                  `.cards.you :nth-of-type(${card.drawnIndex + 1})`
                 )
                 .classList.remove("hidden");
 
@@ -231,16 +229,16 @@ export default {
         setTimeout(() => {
           const card =
             this.$store.state.animateCards[this.findAnimateCardsIndex(id)];
-          if (card && card.draw && card.player)
+          if (card && card.draw && card.player) {
             document
-              .querySelector(
-                `.cards.you :nth-of-type(${
-                  this.$store.state.room.you.lastDrawnCard + 1
-                })`
-              )
+              .querySelector(`.cards.you :nth-of-type(${card.drawnIndex})`)
               .classList.remove("hidden");
 
-          if (
+            this.$store.commit(
+              "REMOVE_ANIMATE_CARD",
+              this.findAnimateCardsIndex(id)
+            );
+          } else if (
             this.$refs.card &&
             this.$refs.card.ontransitionend &&
             !card.player

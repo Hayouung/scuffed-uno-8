@@ -51,6 +51,7 @@ export default {
         you: false,
       },
       isPlayAgain: false,
+      playerCardTimes: [],
     };
   },
   computed: {
@@ -156,6 +157,16 @@ export default {
     playerCards(cards, oldCards) {
       if (!cards) return;
 
+      if (cards.length !== oldCards.length) {
+        this.playerCardTimes = [];
+
+        for (let i = 0; i < cards.length; i++) {
+          this.playerCardTimes.push(
+            performance ? performance.now() : Date.now()
+          );
+        }
+      }
+
       // player draw card animation
       if (cards.length > oldCards.length) {
         const card = cards[this.room.you.lastDrawnCard];
@@ -188,8 +199,9 @@ export default {
                 x: destBox.x,
                 y: destBox.y,
               },
-              transform:
-                "rotate(-30deg) rotateY(20deg) rotateX(20deg) scale(0.85)",
+              transform: `rotate(-30deg) rotateY(20deg) rotateX(20deg) scale(${
+                this.room.you.canPlay ? 0.8 : 0.6
+              })`,
             });
           }
         });
@@ -424,7 +436,7 @@ export default {
       this.$store.commit("RESET_ROOM");
 
       // this.$store.state.reloading = true;
-      this.$router.push({ name: "Home" });
+      if (this.$route.name !== "Home") this.$router.push({ name: "Home" });
       // window.location.replace("/");
     },
     drawCard() {
@@ -552,7 +564,7 @@ export default {
     },
   },
   mounted() {
-    if (!this.room.id) return this.$router.push({ name: "Home" });
+    if (!this.room.id) return;
 
     window.onblur = () => (this.$store.state.animateCards = []);
     window.onfocus = () => (this.$store.state.animateCards = []);
@@ -811,6 +823,7 @@ export default {
           turn:
             isTurn &&
             room.you.canPlay &&
+            canPlayClient &&
             !(room.awaitingJumpIn && !room.you.canJumpIn),
           swap: swap.you,
         }"
@@ -818,7 +831,7 @@ export default {
       >
         <Card
           v-for="(card, i) in playerCards"
-          :key="`${i}-you-${card.color}${card.number}${card.type}`"
+          :key="`${i}-you-${card.color}${card.number}${card.type}-${playerCardTimes[i]}`"
           :index="i"
           :color="card.color"
           :number="card.number"

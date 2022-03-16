@@ -136,7 +136,7 @@ export default {
       }
 
       if (room.started) {
-        this.$router.push({ name: "Game" });
+        if (this.$route.name !== "Game") this.$router.push({ name: "Game" });
       }
 
       // if (room.id === "") {
