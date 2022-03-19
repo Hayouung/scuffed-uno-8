@@ -214,12 +214,13 @@ export default {
           if (card.steps === 0) {
             if (this.$refs.card) this.$refs.card.ontransitionend = undefined;
 
-            if (card.draw && card.player)
+            if (card.draw && card.player) {
               document
                 .querySelector(
                   `.cards.you :nth-of-type(${card.drawnIndex + 1})`
                 )
                 .classList.remove("hidden");
+            }
 
             this.$store.commit("REMOVE_ANIMATE_CARD", this.index);
           }
@@ -231,7 +232,7 @@ export default {
             this.$store.state.animateCards[this.findAnimateCardsIndex(id)];
           if (card && card.draw && card.player) {
             document
-              .querySelector(`.cards.you :nth-of-type(${card.drawnIndex})`)
+              .querySelector(`.cards.you :nth-of-type(${card.drawnIndex + 1})`)
               .classList.remove("hidden");
 
             this.$store.commit(
@@ -248,7 +249,7 @@ export default {
               this.findAnimateCardsIndex(id)
             );
           }
-        }, 200);
+        }, 240);
 
         // if after 5s player card isnt removed then remove it manually
         if (card.player) {
