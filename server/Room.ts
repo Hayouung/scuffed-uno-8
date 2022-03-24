@@ -247,11 +247,15 @@ export class Room {
 
     if (this.awaitingJumpIn) {
       // console.log("play jump in card", this.jumpInTime);
+      this.turn = player;
 
       this.clearJumpIns();
-      this.stack = 0;
+      if (this.topCard().type === CardType.Plus2) this.stack -= 2;
+      if (this.stack < 0) this.stack = 0; // just to make sure
 
+      await sleep(500);
       this.broadcastState();
+      await sleep(500);
     }
 
     // prevent anyone else from playing while we perform this card play
@@ -289,7 +293,26 @@ export class Room {
     const nextPlayer = this.getNextPlayer();
     let draw = 0;
 
-    let needsUnoPunished = this.needsUnoPunished(player);
+    // punish player for not calling uno
+    const needsUnoPunished = this.needsUnoPunished(player);
+    await this.punishMissedUno(player, needsUnoPunished);
+
+    // check jump ins
+    if (this.settings.jumpIn) {
+      // console.log("checking jump ins");
+      const time = await this.checkJumpIns();
+
+      if (this.awaitingJumpIn && time === this.jumpInTime) {
+        // console.log("no jump in", this.jumpInTime);
+        // a player could have jumped in but didn't
+        this.clearJumpIns();
+        this.broadcastState();
+      } else if (time !== -1) {
+        // a player jumped in
+        // console.log("player jumped in", time);
+        return;
+      }
+    }
 
     switch (card.type) {
       case CardType.Plus2:
@@ -357,26 +380,6 @@ export class Room {
           }
         }
         break;
-    }
-
-    // punish player for not calling uno
-    await this.punishMissedUno(player, needsUnoPunished);
-
-    // check jump ins
-    if (this.settings.jumpIn) {
-      // console.log("checking jump ins");
-      const time = await this.checkJumpIns();
-
-      if (this.awaitingJumpIn && time === this.jumpInTime) {
-        // console.log("no jump in", this.jumpInTime);
-        // a player could have jumped in but didn't
-        this.clearJumpIns();
-        this.broadcastState();
-      } else if (time !== -1) {
-        // a player jumped in
-        // console.log("player jumped in", time);
-        return;
-      }
     }
 
     // go to next turn
