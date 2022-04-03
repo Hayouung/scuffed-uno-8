@@ -265,20 +265,20 @@ export default {
       this.fetchingPublicRooms = false;
     });
 
-    if (window.innerWidth >= 900 && !this.$store.state.reloading) {
-      window.GameAdsRenew("gameadsbanner");
-    }
+    // if (window.innerWidth >= 900 && !this.$store.state.reloading) {
+    //   window.GameAdsRenew("gameadsbanner");
+    // }
 
-    this.gameAdsInterval = setInterval(() => {
-      const scripts = Array.from(document.getElementsByTagName("script"));
-      scripts.forEach((s) => {
-        if (s.src.includes("https://n.gameads.io/getcode?")) s.remove();
-      });
+    // this.gameAdsInterval = setInterval(() => {
+    //   const scripts = Array.from(document.getElementsByTagName("script"));
+    //   scripts.forEach((s) => {
+    //     if (s.src.includes("https://n.gameads.io/getcode?")) s.remove();
+    //   });
 
-      if (window.innerWidth >= 900 && !this.$store.state.reloading) {
-        window.GameAdsRenew("gameadsbanner");
-      }
-    }, 17000);
+    //   if (window.innerWidth >= 900 && !this.$store.state.reloading) {
+    //     window.GameAdsRenew("gameadsbanner");
+    //   }
+    // }, 17000);
 
     if (this.$route.params.playAgain) {
       this.currentLevel = "onlineRoom";
@@ -306,7 +306,7 @@ export default {
     });
   },
   destroyed() {
-    clearInterval(this.gameAdsInterval);
+    if (this.gameadsInterval) clearInterval(this.gameAdsInterval);
 
     observer.disconnect();
     this.$store.state.socket.off("recieve-public-rooms");
@@ -405,9 +405,9 @@ export default {
       class="ad-left ad-home-left"
     />
 
-    <div class="gameads-container" @click="gameadsClicked()">
+    <!-- <div class="gameads-container" @click="gameadsClicked()">
       <div id="gameadsbanner"></div>
-    </div>
+    </div> -->
 
     <a
       class="watermark stats-link"

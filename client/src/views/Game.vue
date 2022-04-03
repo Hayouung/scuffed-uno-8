@@ -299,11 +299,11 @@ export default {
         this.animateOtherPlayCard(other, room.wildcard, true);
       }
 
-      if (room.winner && window.innerHeight >= 650) {
-        setTimeout(() => {
-          window.GameAdsRenew("gameadsbanner");
-        }, 600);
-      }
+      // if (room.winner && window.innerHeight >= 650) {
+      //   setTimeout(() => {
+      //     window.GameAdsRenew("gameadsbanner");
+      //   }, 600);
+      // }
     },
   },
   methods: {
@@ -618,13 +618,13 @@ export default {
 
 <template>
   <div class="game">
-    <div
+    <!-- <div
       v-if="room.winner"
       class="gameads-container-win"
       @click="gameadsClicked"
     >
       <div id="gameadsbanner"></div>
-    </div>
+    </div> -->
 
     <chat />
 
