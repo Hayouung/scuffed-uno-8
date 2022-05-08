@@ -64,18 +64,6 @@ export default {
 
 <template>
   <div class="ad" ref="ad">
-    <ins
-      class="adsbygoogle"
-      :style="{
-        display: `inline-block`,
-        width: `${width}px`,
-        height: `${height}px`,
-        background: adtest ? `white` : ``,
-      }"
-      :data-ad-client="$store.state.adClient"
-      :data-ad-slot="adSlot"
-      :data-adtest="adtest"
-    ></ins>
   </div>
 </template>
 
