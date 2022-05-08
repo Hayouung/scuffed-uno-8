@@ -34,6 +34,17 @@ export default {
       {{ room.you.username }} : {{ room.you.count }}
     </div>
     <div
+      v-if="room.bottomRight && room.started"
+      class="player-card bottomRight"
+      :class="{
+        playing: room.turn === room.bottomRight.id,
+        skip: room.bottomRight.skip,
+        swap: swap.bottomRight,
+      }"
+    >
+      {{ room.bottomRight.username }} : {{ room.bottomRight.count }}
+    </div>
+    <div
       v-if="room.right && room.started"
       class="player-card right"
       :class="{
@@ -43,6 +54,39 @@ export default {
       }"
     >
       {{ room.right.username }} : {{ room.right.count }}
+    </div>
+    <div
+      v-if="room.topRight && room.started"
+      class="player-card topRight"
+      :class="{
+        playing: room.turn === room.topRight.id,
+        skip: room.topRight.skip,
+        swap: swap.topRight,
+      }"
+    >
+      {{ room.topRight.username }} : {{ room.topRight.count }}
+    </div>
+    <div
+      v-if="room.top && room.started"
+      class="player-card top"
+      :class="{
+        playing: room.turn === room.top.id,
+        skip: room.top.skip,
+        swap: swap.top,
+      }"
+    >
+      {{ room.top.username }} : {{ room.top.count }}
+    </div>
+    <div
+      v-if="room.topLeft && room.started"
+      class="player-card topLeft"
+      :class="{
+        playing: room.turn === room.topLeft.id,
+        skip: room.topLeft.skip,
+        swap: swap.topLeft,
+      }"
+    >
+      {{ room.topLeft.username }} : {{ room.topLeft.count }}
     </div>
     <div
       v-if="room.left && room.started"
@@ -56,15 +100,15 @@ export default {
       {{ room.left.username }} : {{ room.left.count }}
     </div>
     <div
-      v-if="room.top && room.started"
-      class="player-card top"
+      v-if="room.bottomLeft && room.started"
+      class="player-card bottomLeft"
       :class="{
-        playing: room.turn === room.top.id,
-        skip: room.top.skip,
-        swap: swap.top,
+        playing: room.turn === room.bottomLeft.id,
+        skip: room.bottomLeft.skip,
+        swap: swap.bottomLeft,
       }"
     >
-      {{ room.top.username }} : {{ room.top.count }}
+      {{ room.bottomLeft.username }} : {{ room.bottomLeft.count }}
     </div>
   </div>
 </template>
@@ -133,21 +177,30 @@ $mobile: 900px;
     }
   }
 
-  &.right {
+  &.bottomRight {
     right: 105px;
-    bottom: 51%;
+    bottom: 3%;
 
     @media screen and (max-width: $mobile) {
       right: 20px;
     }
   }
 
-  &.left {
-    left: 105px;
-    bottom: 51%;
+  &.right {
+    right: 105px;
+    bottom: 40%;
 
     @media screen and (max-width: $mobile) {
-      left: 10px;
+      right: 20px;
+    }
+  }
+
+  &.topRight {
+    right: 105px;
+    bottom: 73%;
+
+    @media screen and (max-width: $mobile) {
+      right: 20px;
     }
   }
 
@@ -158,6 +211,33 @@ $mobile: 900px;
     @media screen and (max-width: $mobile) {
       left: 40.5%;
       top: 50px;
+    }
+  }
+
+  &.topLeft {
+    left: 105px;
+    bottom: 73%;
+
+    @media screen and (max-width: $mobile) {
+      left: 10px;
+    }
+  }
+
+  &.left {
+    left: 105px;
+    bottom: 40%;
+
+    @media screen and (max-width: $mobile) {
+      left: 10px;
+    }
+  }
+
+  &.bottomLeft {
+    left: 105px;
+    bottom: 3%;
+
+    @media screen and (max-width: $mobile) {
+      left: 10px;
     }
   }
 

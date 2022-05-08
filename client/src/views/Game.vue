@@ -262,7 +262,7 @@ export default {
       }
 
       // other players playing card animations
-      const others = ["right", "top", "left"];
+      const others = ["bottomRight", "right", "topRight", "top", "topLeft", "left", "bottomLeft"];
       for (let i = 0; i < others.length; i++) {
         const other = others[i];
         if (!room[other]) continue;
@@ -292,9 +292,13 @@ export default {
       // handle wildcard animation
       if (room.wildcard && room.turn !== room.you.id) {
         let other = "";
-        if (room.right && room.right.id === room.turn) other = "right";
+        if (room.bottomRight && room.bottomRight.id === room.turn) other = "bottomRight";
+        else if (room.right && room.right.id === room.turn) other = "right";
+        else if (room.topRight && room.topRight.id === room.turn) other = "topRight";
+        else if (room.top && room.top.id === room.turn) other = "top";
+        else if (room.topLeft && room.topLeft.id === room.turn) other = "topLeft";
         else if (room.left && room.left.id === room.turn) other = "left";
-        else other = "top";
+        else other = "bottomLeft";
 
         this.animateOtherPlayCard(other, room.wildcard, true);
       }
@@ -477,15 +481,15 @@ export default {
           anchor = "bottom";
           transform += "translate(0, -35vh)";
           break;
-        case "right":
+        case "right" || "bottomRight":
           anchor = "right";
           transform += "translate(-35vh)";
           break;
-        case "top":
+        case "top" || "topRight" || "topLeft":
           anchor = "top";
           transform += "translate(0, 35vh)";
           break;
-        case "left":
+        case "left" || "bottomLeft":
           anchor = "left";
           transform += "translate(35vh)";
           break;
@@ -545,12 +549,20 @@ export default {
       this.showKeepCard = false;
     },
     getPositionFromId(id) {
-      if (this.room.right && this.room.right.id === id) {
+      if (this.room.bottomRight && this.room.bottomRight.id === id) {
+        return "bottomRight";
+      } else if (this.room.right && this.room.right.id === id) {
         return "right";
-      } else if (this.room.left && this.room.left.id === id) {
-        return "left";
+      } else if (this.room.topRight && this.room.topRight.id === id) {
+        return "topRight";
       } else if (this.room.top && this.room.top.id === id) {
         return "top";
+      } else if (this.room.topLeft && this.room.topLeft.id === id) {
+        return "topLeft";
+      } else if (this.room.left && this.room.left.id === id) {
+        return "left";
+      } else if (this.room.bottomLeft && this.room.bottomLeft.id === id) {
+        return "bottomLeft";
       } else if (this.room.you && this.room.you.id === id) {
         return "you";
       }
@@ -709,9 +721,33 @@ export default {
     />
 
     <u-game-pick-hand
+      v-else-if="$store.state.room.bottomRight && $store.state.room.bottomRight.canPickHand"
+      :isTurn="false"
+      class="bottomRight"
+    />
+
+    <u-game-pick-hand
       v-else-if="$store.state.room.right && $store.state.room.right.canPickHand"
       :isTurn="false"
       class="right"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.topRight && $store.state.room.topRight.canPickHand"
+      :isTurn="false"
+      class="topRight"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.top && $store.state.room.top.canPickHand"
+      :isTurn="false"
+      class="top"
+    />
+
+    <u-game-pick-hand
+      v-else-if="$store.state.room.topLeft && $store.state.room.topLeft.canPickHand"
+      :isTurn="false"
+      class="topLeft"
     />
 
     <u-game-pick-hand
@@ -721,9 +757,9 @@ export default {
     />
 
     <u-game-pick-hand
-      v-else-if="$store.state.room.top && $store.state.room.top.canPickHand"
+      v-else-if="$store.state.room.bottomLeft && $store.state.room.bottomLeft.canPickHand"
       :isTurn="false"
-      class="top"
+      class="bottomLeft"
     />
 
     <img ref="unoAlert" class="uno-alert" src="@/assets/logo.png" alt="" />

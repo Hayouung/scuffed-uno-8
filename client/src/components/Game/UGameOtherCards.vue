@@ -26,6 +26,19 @@ export default {
 <template>
   <div class="other-cards-container">
     <div
+      v-if="room.bottomRight"
+      class="cards other bottomRight"
+      :style="{ '--count': `${room.bottomRight.count}` }"
+      :class="{ swap: swap.bottomRight }"
+    >
+      <Card
+        v-for="i in room.bottomRight.count"
+        :key="i + 'bottomRight'"
+        back
+        :style="{ zIndex: i }"
+      />
+    </div>
+    <div
       v-if="room.right"
       class="cards other right"
       :style="{ '--count': `${room.right.count}` }"
@@ -34,6 +47,45 @@ export default {
       <Card
         v-for="i in room.right.count"
         :key="i + 'right'"
+        back
+        :style="{ zIndex: i }"
+      />
+    </div>
+    <div
+      v-if="room.topRight"
+      class="cards other topRight"
+      :style="{ '--count': `${room.topRight.count}` }"
+      :class="{ swap: swap.topRight }"
+    >
+      <Card
+        v-for="i in room.topRight.count"
+        :key="i + 'topRight'"
+        back
+        :style="{ zIndex: i }"
+      />
+    </div>
+    <div
+      v-if="room.top"
+      class="cards other top"
+      :style="{ '--count': `${room.top.count}` }"
+      :class="{ swap: swap.top }"
+    >
+      <Card
+        v-for="i in room.top.count"
+        :key="i + 'top'"
+        back
+        :style="{ zIndex: i }"
+      />
+    </div>
+    <div
+      v-if="room.topLeft"
+      class="cards other topLeft"
+      :style="{ '--count': `${room.topLeft.count}` }"
+      :class="{ swap: swap.topLeft }"
+    >
+      <Card
+        v-for="i in room.topLeft.count"
+        :key="i + 'topLeft'"
         back
         :style="{ zIndex: i }"
       />
@@ -52,14 +104,14 @@ export default {
       />
     </div>
     <div
-      v-if="room.top"
-      class="cards other top"
-      :style="{ '--count': `${room.top.count}` }"
-      :class="{ swap: swap.top }"
+      v-if="room.bottomLeft"
+      class="cards other bottomLeft"
+      :style="{ '--count': `${room.bottomLeft.count}` }"
+      :class="{ swap: swap.bottomLeft }"
     >
       <Card
-        v-for="i in room.top.count"
-        :key="i + 'top'"
+        v-for="i in room.bottomLeft.count"
+        :key="i + 'bottomLeft'"
         back
         :style="{ zIndex: i }"
       />
@@ -89,33 +141,42 @@ $mobile: 900px;
     }
   }
 
-  &.right {
+  &.bottomRight {
     right: 120px;
-    bottom: 48%;
+    bottom: 0;
     transform-origin: bottom right;
     transform: rotate(15deg) rotateY(50deg) rotateZ(5deg) rotateX(20deg)
       scale(0.75);
 
     @media screen and (max-width: $mobile) {
       right: 50px;
-      bottom: 46%;
+      bottom: 0;
     }
   }
 
-  &.left {
-    left: 120px;
-    bottom: 48%;
-    transform-origin: bottom left;
-    transform: rotate(-15deg) rotateY(-50deg) rotateZ(-5deg) rotateX(20deg)
+  &.right {
+    right: 120px;
+    bottom: 38%;
+    transform-origin: bottom right;
+    transform: rotate(15deg) rotateY(50deg) rotateZ(5deg) rotateX(20deg)
       scale(0.75);
 
     @media screen and (max-width: $mobile) {
-      left: 50px;
-      bottom: 46%;
+      right: 50px;
+      bottom: 38%;
     }
+  }
 
-    .card:first-of-type {
-      margin-left: 0 !important;
+  &.topRight {
+    right: 120px;
+    bottom: 70%;
+    transform-origin: bottom right;
+    transform: rotate(15deg) rotateY(50deg) rotateZ(5deg) rotateX(20deg)
+      scale(0.75);
+
+    @media screen and (max-width: $mobile) {
+      right: 50px;
+      bottom: 70%;
     }
   }
 
@@ -126,6 +187,57 @@ $mobile: 900px;
     @media screen and (max-width: $mobile) {
       transform-origin: top center;
       top: 20px;
+    }
+  }
+
+   &.topLeft {
+    left: 120px;
+    bottom: 70%;
+    transform-origin: bottom left;
+    transform: rotate(-15deg) rotateY(-50deg) rotateZ(-5deg) rotateX(20deg)
+      scale(0.75);
+
+    @media screen and (max-width: $mobile) {
+      left: 50px;
+      bottom: 70%;
+    }
+
+    .card:first-of-type {
+      margin-left: 0 !important;
+    }
+  }
+
+  &.left {
+    left: 120px;
+    bottom: 38%;
+    transform-origin: bottom left;
+    transform: rotate(-15deg) rotateY(-50deg) rotateZ(-5deg) rotateX(20deg)
+      scale(0.75);
+
+    @media screen and (max-width: $mobile) {
+      left: 50px;
+      bottom: 38%;
+    }
+
+    .card:first-of-type {
+      margin-left: 0 !important;
+    }
+  }
+
+  &.bottomLeft {
+    left: 120px;
+    bottom: 0;
+    transform-origin: bottom left;
+    transform: rotate(-15deg) rotateY(-50deg) rotateZ(-5deg) rotateX(20deg)
+      scale(0.75);
+
+    @media screen and (max-width: $mobile) {
+      left: 50px;
+      bottom: 0;
+    }
+
+    .card:first-of-type {
+      margin-left: 0 !important;
     }
   }
 }

@@ -567,23 +567,33 @@ export class Room {
   }
 
   getOtherPlayers(player: Player) {
-    let right;
-    let top;
-    let left;
+    let bottomRight, right, topRight, top, topLeft, left, bottomLeft;
     switch (this.players.length) {
+      case 8:
+        bottomLeft = this.getPlayerPosFromOffset(player, 7);
+      case 7:
+        left = this.getPlayerPosFromOffset(player, 6);
+      case 6:
+        topLeft = this.getPlayerPosFromOffset(player, 5);
+      case 5:
+        top = this.getPlayerPosFromOffset(player, 4);
       case 4:
-        left = this.getPlayerPosFromOffset(player, 3);
+        topRight = this.getPlayerPosFromOffset(player, 3);
       case 3:
-        top = this.getPlayerPosFromOffset(player, 2);
+        right = this.getPlayerPosFromOffset(player, 2);
       case 2:
-        right = this.getPlayerPosFromOffset(player, 1);
+        bottomRight = this.getPlayerPosFromOffset(player, 1);
         break;
     }
 
     return {
-      left,
+      bottomRight,
       right,
+      topRight,
       top,
+      topLeft,
+      left,
+      bottomLeft
     };
   }
 
@@ -591,7 +601,15 @@ export class Room {
     this.players.forEach((player) => {
       if (player.bot) return;
 
-      const { left, right, top } = this.getOtherPlayers(player);
+      const {
+        bottomRight,
+        right,
+        topRight,
+        top,
+        topLeft,
+        left,
+        bottomLeft
+      } = this.getOtherPlayers(player);
 
       const winner = this.winner ? { username: this.winner.username, id: this.winner.id } : undefined;
 
@@ -616,6 +634,17 @@ export class Room {
           calledUno: player.hasCalledUno,
           skip: !player.canPlay && this.turn.id === player.id,
         },
+        bottomRight: bottomRight
+          ? {
+              username: bottomRight.username,
+              count: bottomRight.cards.length,
+              id: bottomRight.id,
+              isBot: bottomRight.bot,
+              calledUno: bottomRight.hasCalledUno,
+              skip: !bottomRight.canPlay && this.turn.id === bottomRight.id,
+              canPickHand: bottomRight.canPickHand,
+            }
+          : undefined,
         right: right
           ? {
               username: right.username,
@@ -625,6 +654,17 @@ export class Room {
               calledUno: right.hasCalledUno,
               skip: !right.canPlay && this.turn.id === right.id,
               canPickHand: right.canPickHand,
+            }
+          : undefined,
+        topRight: topRight
+          ? {
+              username: topRight.username,
+              count: topRight.cards.length,
+              id: topRight.id,
+              isBot: topRight.bot,
+              calledUno: topRight.hasCalledUno,
+              skip: !topRight.canPlay && this.turn.id === topRight.id,
+              canPickHand: topRight.canPickHand,
             }
           : undefined,
         top: top
@@ -638,6 +678,17 @@ export class Room {
               canPickHand: top.canPickHand,
             }
           : undefined,
+        topLeft: topLeft
+          ? {
+              username: topLeft.username,
+              count: topLeft.cards.length,
+              id: topLeft.id,
+              isBot: topLeft.bot,
+              calledUno: topLeft.hasCalledUno,
+              skip: !topLeft.canPlay && this.turn.id === topLeft.id,
+              canPickHand: topLeft.canPickHand,
+            }
+          : undefined,
         left: left
           ? {
               username: left.username,
@@ -647,6 +698,17 @@ export class Room {
               calledUno: left.hasCalledUno,
               skip: !left.canPlay && this.turn.id === left.id,
               canPickHand: left.canPickHand,
+            }
+          : undefined,
+        bottomLeft: bottomLeft
+          ? {
+              username: bottomLeft.username,
+              count: bottomLeft.cards.length,
+              id: bottomLeft.id,
+              isBot: bottomLeft.bot,
+              calledUno: bottomLeft.hasCalledUno,
+              skip: !bottomLeft.canPlay && this.turn.id === bottomLeft.id,
+              canPickHand: bottomLeft.canPickHand,
             }
           : undefined,
         winner,

@@ -25,7 +25,7 @@ setInterval(() => {
 }, 60000 * 3);
 
 const defaultSettings: Settings = {
-  maxPlayers: 4,
+  maxPlayers: 8,
   public: false,
   stacking: true,
   forcePlay: false,
@@ -61,7 +61,7 @@ const validateSettings = (settings: any): Settings | false => {
 
   const s = <Settings>settings;
 
-  if (s.maxPlayers < 2 || s.maxPlayers > 4) return false;
+  if (s.maxPlayers < 2 || s.maxPlayers > 8) return false;
 
   return s;
 };

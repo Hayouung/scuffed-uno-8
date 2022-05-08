@@ -37,7 +37,7 @@ export default {
           seven0: false,
           jumpIn: false,
           public: false,
-          maxPlayers: 4,
+          maxPlayers: 8,
         },
       },
       createRoomForm: {
@@ -51,7 +51,7 @@ export default {
           seven0: false,
           jumpIn: false,
           public: false,
-          maxPlayers: 4,
+          maxPlayers: 8,
         },
       },
       joinRoomForm: {
@@ -105,9 +105,13 @@ export default {
     room(room) {
       const players = [room.you];
 
+      if (room.bottomRight) players.push(room.bottomRight);
       if (room.right) players.push(room.right);
+      if (room.topRight) players.push(room.topRight);
       if (room.top) players.push(room.top);
+      if (room.topLeft) players.push(room.topLeft);
       if (room.left) players.push(room.left);
+      if (room.bottomLeft) players.push(room.bottomLeft);
 
       const solo = [];
       for (let i = 0; i < players.length; i++) {
