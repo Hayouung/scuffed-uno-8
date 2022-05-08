@@ -35,29 +35,7 @@ export default {
     },
   },
   mounted() {
-    const ad = this.$refs.ad;
-    if (
-      !ad ||
-      window.innerWidth < this.viewWidth ||
-      window.innerHeight < this.viewHeight ||
-      this.$store.state.reloading
-    )
-      return;
 
-    const conf = document.createElement("script");
-    conf.innerHTML = `(adsbygoogle = window.adsbygoogle || []).push({});`;
-
-    const script = document.createElement("script");
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${this.$store.state.adClient}`;
-
-    if (window.location.hostname === "localhost") {
-      this.adtest = "on";
-    }
-
-    ad.appendChild(conf);
-    ad.appendChild(script);
   },
 };
 </script>
