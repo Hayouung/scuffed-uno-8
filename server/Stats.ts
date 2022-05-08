@@ -102,49 +102,49 @@ const decrementPickedColors = (color: "red" | "blue" | "green" | "yellow", dec: 
 
 // update stats github gist
 
-setInterval(async () => {
-  if (process.env.NODE_ENV !== "production") return;
-
-  const cloud = await fetchStats();
-  if (cloud.lobbiesOnline === undefined) return console.log("Empty cloud");
-
-  const total: Stats = {
-    lobbiesOnline: STATS.lobbiesOnline,
-    playersOnline: STATS.playersOnline,
-    totalVisits: STATS.totalVisits + cloud.totalVisits,
-    lobbiesCreated: STATS.lobbiesCreated + cloud.lobbiesCreated,
-    gamesPlayed: STATS.gamesPlayed + cloud.gamesPlayed,
-    botsUsed: STATS.botsUsed + cloud.botsUsed,
-    unosCalled: STATS.unosCalled + cloud.unosCalled,
-    cardsPlayed: STATS.cardsPlayed + cloud.cardsPlayed,
-    plus4sDealt: STATS.plus4sDealt + cloud.plus4sDealt,
-    pickedColors: {
-      red: STATS.pickedColors.red + cloud.pickedColors.red,
-      blue: STATS.pickedColors.blue + cloud.pickedColors.blue,
-      green: STATS.pickedColors.green + cloud.pickedColors.green,
-      yellow: STATS.pickedColors.yellow + cloud.pickedColors.yellow,
-    },
-  };
-
-  STATS = {
-    lobbiesOnline: 0,
-    playersOnline: 0,
-    totalVisits: 0,
-    lobbiesCreated: 0,
-    gamesPlayed: 0,
-    botsUsed: 0,
-    unosCalled: 0,
-    cardsPlayed: 0,
-    plus4sDealt: 0,
-    pickedColors: {
-      red: 0,
-      blue: 0,
-      green: 0,
-      yellow: 0,
-    },
-  };
-
-  await writeStats(JSON.stringify(total));
-}, 300000);
+// setInterval(async () => {
+//   if (process.env.NODE_ENV !== "production") return;
+//
+//   const cloud = await fetchStats();
+//   if (cloud.lobbiesOnline === undefined) return console.log("Empty cloud");
+//
+//   const total: Stats = {
+//     lobbiesOnline: STATS.lobbiesOnline,
+//     playersOnline: STATS.playersOnline,
+//     totalVisits: STATS.totalVisits + cloud.totalVisits,
+//     lobbiesCreated: STATS.lobbiesCreated + cloud.lobbiesCreated,
+//     gamesPlayed: STATS.gamesPlayed + cloud.gamesPlayed,
+//     botsUsed: STATS.botsUsed + cloud.botsUsed,
+//     unosCalled: STATS.unosCalled + cloud.unosCalled,
+//     cardsPlayed: STATS.cardsPlayed + cloud.cardsPlayed,
+//     plus4sDealt: STATS.plus4sDealt + cloud.plus4sDealt,
+//     pickedColors: {
+//       red: STATS.pickedColors.red + cloud.pickedColors.red,
+//       blue: STATS.pickedColors.blue + cloud.pickedColors.blue,
+//       green: STATS.pickedColors.green + cloud.pickedColors.green,
+//       yellow: STATS.pickedColors.yellow + cloud.pickedColors.yellow,
+//     },
+//   };
+//
+//   STATS = {
+//     lobbiesOnline: 0,
+//     playersOnline: 0,
+//     totalVisits: 0,
+//     lobbiesCreated: 0,
+//     gamesPlayed: 0,
+//     botsUsed: 0,
+//     unosCalled: 0,
+//     cardsPlayed: 0,
+//     plus4sDealt: 0,
+//     pickedColors: {
+//       red: 0,
+//       blue: 0,
+//       green: 0,
+//       yellow: 0,
+//     },
+//   };
+//
+//   await writeStats(JSON.stringify(total));
+// }, 300000);
 
 export { incrementStat, decrementStat, incrementPickedColors, decrementPickedColors };
