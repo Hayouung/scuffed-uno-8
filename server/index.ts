@@ -1,17 +1,19 @@
 import express from "express";
+import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
 import setupSocket from "./socket";
 
 const app = express();
+app.use(cors())
 const http = createServer(app);
 const io = new Server(http, {
   cors: {
     origin:
       process.env.NODE_ENV === "production"
         ? [
-            "*",
+            "https://scuffed-uno-8.netlify.app/",
           ]
         : "*",
     methods: ["GET", "POST"],
