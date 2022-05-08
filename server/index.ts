@@ -11,10 +11,7 @@ const io = new Server(http, {
     origin:
       process.env.NODE_ENV === "production"
         ? [
-            "https://scuffeduno.online",
-            "https://scuffeduno.netlify.app",
-            "https://uncached.gamemonetize.co",
-            "https://html5.gamemonetize.co",
+            "https://scuffed-uno-8.herokuapp.com",
           ]
         : "*",
     methods: ["GET", "POST"],
@@ -22,6 +19,8 @@ const io = new Server(http, {
 });
 
 io.on("connection", setupSocket);
+
+app.get('/', (req, res) => res.send('hi'))
 
 const port = 3000;
 
