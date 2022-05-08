@@ -20,8 +20,6 @@ const io = new Server(http, {
 
 io.on("connection", setupSocket);
 
-app.get('/', (req, res) => res.send('hi'))
-
 const port = 3000;
 
 http.listen(port, () => {
