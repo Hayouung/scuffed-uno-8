@@ -11,7 +11,7 @@ const io = new Server(http, {
     origin:
       process.env.NODE_ENV === "production"
         ? [
-            "https://scuffed-uno-8.netlify.app/",
+            "*",
           ]
         : "*",
     methods: ["GET", "POST"],
