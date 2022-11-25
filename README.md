@@ -1,6 +1,6 @@
 This is a fork to support 8 players because sometimes more than 4 players want to play and I feel bad leaving them out :(
 
-Code that has been added to support 8 players is way too scuffed so don't want to make pull request.
+Code that has been added to support 8 players is way too scuffed so don't want to make pull request...
 
 # 🃏 [Scuffed Uno](https://scuffeduno.online) 🃏
 
