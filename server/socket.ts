@@ -115,11 +115,20 @@ export default function(socket: Socket) {
 
     // get room
     const room = rooms[roomCode];
-    if (!room || room.players.length === room.settings.maxPlayers || room.started || room.isRoomEmpty)
+    if (!room || room.players.length === room.settings.maxPlayers || room.isRoomEmpty)
       return socket.emit("kicked");
 
     player.username = username;
     room.addPlayer(player);
+
+    if (room.started) {
+      player.cards = []
+      for (let i = 0; i < 7; i++) {
+        room.giveCard(player);
+      }
+      player.sortCards()
+      room.broadcastState()
+    }
 
     updatePublicRoomPlayerCount(player, 1);
   };
