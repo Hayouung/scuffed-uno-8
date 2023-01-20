@@ -7,7 +7,6 @@ import UGameColorPicker from "@/components/Game/UGameColorPicker.vue";
 import UGamePlayerCards from "@/components/Game/UGamePlayerCards.vue";
 import UMenuBtn from "@/components/Menu/UMenuBtn.vue";
 import USettingsMenu from "../components/USettingsMenu.vue";
-import Advert from "../components/Advert.vue";
 import Chat from "../components/Chat.vue";
 import UGamePickHand from "../components/Game/UGamePickHand.vue";
 
@@ -22,12 +21,12 @@ export default {
     UGamePlayerCards,
     UMenuBtn,
     USettingsMenu,
-    Advert,
     Chat,
     UGamePickHand,
   },
   data() {
     return {
+      copied: false,
       topCardTransform: null,
       pickColor: false,
       wildcardColor: null,
@@ -574,6 +573,18 @@ export default {
 
       this.$router.push({ name: "Home", params: { playAgain: true } });
     },
+    copyJoinRoomLink() {
+      const link = `${window.location.origin}/?room=${encodeURI(this.room.id)}`;
+      window.navigator.clipboard
+        .writeText(link)
+        .then(() => {
+          this.copied = true
+          setTimeout(() => this.copied = false, 2000)
+        })
+        .catch((err) =>
+          alert(`Sorry we couldn't copy the link to the clipboard: ${err}`)
+        );
+    },
   },
   mounted() {
     if (!this.room.id) return;
@@ -630,62 +641,7 @@ export default {
 
 <template>
   <div class="game">
-    <!-- <div
-      v-if="room.winner"
-      class="gameads-container-win"
-      @click="gameadsClicked"
-    >
-      <div id="gameadsbanner"></div>
-    </div> -->
-
     <chat />
-
-    <advert
-      v-if="!room.winner"
-      adSlot="8788085732"
-      :width="468"
-      :height="60"
-      :viewWidth="900"
-      class="ad-top ad-top-game"
-      :class="{ win: room.winner }"
-    />
-
-    <advert
-      v-if="room.winner"
-      adSlot="8062339187"
-      :width="336"
-      :height="280"
-      :viewHeight="810"
-      :viewWidth="340"
-      class="ad-top-win"
-    />
-
-    <!-- <advert
-      v-if="room.winner"
-      adKey="5bd0055c6997223ceecc4982f220e09a"
-      :width="468"
-      :height="60"
-      :timeout="600"
-      class="ad-top ad-top2-win"
-    /> -->
-
-    <advert
-      v-if="room.winner"
-      adSlot="6389670028"
-      :width="160"
-      :height="600"
-      :viewWidth="1180"
-      class="ad-left ad-left-win"
-    />
-
-    <advert
-      v-if="room.winner"
-      adSlot="6453249207"
-      :width="250"
-      :height="250"
-      :viewWidth="1350"
-      class="ad-right ad-right-win"
-    />
 
     <u-menu-modal
       v-if="room.winner"
@@ -700,7 +656,14 @@ export default {
       </div>
     </u-menu-modal>
 
-    <button class="settings-btn" @click="showSettings = !showSettings"></button>
+    <div class="info-container">
+      <div class="room-code">
+        <p>Room Code: <span class="room-code-id">{{ room.id }}</span></p>
+        <button class="copy" @click="copyJoinRoomLink">{{ copied ? 'Copied!' : 'Copy Link' }}</button>
+      </div>
+      <button class="settings-btn" @click="showSettings = !showSettings"></button>
+    </div>
+
     <u-settings-menu
       v-if="showSettings"
       title="Settings"
@@ -992,9 +955,6 @@ $table-rotatex: 58deg;
 }
 
 .settings-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   background-image: url("../assets/settings.jpg");
   background-size: 100%;
   height: clamp(60px, 8vw, 100px);
@@ -1242,6 +1202,40 @@ $table-rotatex: 58deg;
 .you {
   .card {
     filter: brightness(0.7);
+  }
+}
+
+.info-container {
+  display: flex;
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  align-items: center;
+  z-index: 99;
+
+  .copy {
+    text-decoration: underline;
+    font-weight: bold;
+    color: #53a944;
+    outline: none;
+    transition: color 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: #50ff31;
+    }
+  }
+
+  .room-code {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 4px 0;
+    margin-right: 8px;
+  }
+
+  .room-code-id {
+    color: white;
   }
 }
 

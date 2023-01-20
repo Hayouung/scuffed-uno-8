@@ -7,7 +7,6 @@ import USettingsMenu from "../components/USettingsMenu.vue";
 
 import menuOptions from "@/mixins/menuOptions";
 import Chat from "../components/Chat.vue";
-import Advert from "../components/Advert.vue";
 
 let observer;
 
@@ -20,13 +19,13 @@ export default {
     UMenuBtn,
     USettingsMenu,
     Chat,
-    Advert,
   },
   mixins: [menuOptions],
   data() {
     return {
       isMounted: false,
       formError: "",
+      copied: false,
       createRoomSoloForm: {
         username: "You",
         settings: {
@@ -212,13 +211,25 @@ export default {
     kickPlayer(i) {
       switch (i) {
         case 1:
-          this.$store.state.socket.emit("kick-player", this.room.right.id);
+          this.$store.state.socket.emit("kick-player", this.room.bottomRight.id);
           break;
         case 2:
-          this.$store.state.socket.emit("kick-player", this.room.top.id);
+          this.$store.state.socket.emit("kick-player", this.room.right.id);
           break;
         case 3:
+          this.$store.state.socket.emit("kick-player", this.room.topRight.id);
+          break;
+        case 4:
+          this.$store.state.socket.emit("kick-player", this.room.top.id);
+          break;
+        case 5:
+          this.$store.state.socket.emit("kick-player", this.room.topLeft.id);
+          break;
+        case 6:
           this.$store.state.socket.emit("kick-player", this.room.left.id);
+          break;
+        case 7:
+          this.$store.state.socket.emit("kick-player", this.room.bottomLeft.id);
           break;
       }
     },
@@ -229,7 +240,10 @@ export default {
       const link = `${window.location.origin}/?room=${encodeURI(this.room.id)}`;
       window.navigator.clipboard
         .writeText(link)
-        .then(() => alert("Copied!"))
+        .then(() => {
+          this.copied = true
+          setTimeout(() => this.copied = false, 2000)
+        })
         .catch((err) =>
           alert(`Sorry we couldn't copy the link to the clipboard: ${err}`)
         );
@@ -329,111 +343,9 @@ export default {
       made by <span>Freddie</span>
     </a>
 
-    <a
-      href="https://docs.google.com/forms/d/e/1FAIpQLSeV6lklbgEZRrw6kw9v7en9hDH5AxdXp99SlztZc62anNxEQQ/viewform"
-      rel="noopener"
-      target="_blank"
-      class="watermark"
-      style="
-        opacity: 0.8;
-        transform: translate(-50%) scale(1.1);
-        left: 50%;
-        right: unset;
-        transform-origin: bottom center;
-        position: absolute;
-        text-decoration: underline;
-      "
-    >
-      Help improve Scuffed Uno!
-    </a>
-
-    <!-- 
-    <u-menu-modal
-      style="font-size: 1.2rem"
-      v-if="$store.state.showAdApology"
-      @close="$store.state.showAdApology = false"
-    >
-      I am extremely sorry for the redirect ads, they were not intended. It
-      seems as tho the ad network I was using had been infected with malware
-      scam ads, Pog. These ads have now been removed.
-    </u-menu-modal> -->
-
-    <!-- <Adsense
-      class="ad ad-side"
-      ins-class="ins"
-      style="display: block"
-      data-ad-client="ca-pub-2444394876892971"
-      data-ad-slot="7743741619"
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-      :data-adtest="isDev ? 'on' : 'off'"
-      :style="{ background: isDev ? 'white' : '' }"
-    ></Adsense> -->
-
-    <!-- scuffed-uno-home ad unit -->
-    <!-- <Adsense
-      class="ad ad-bottom"
-      ins-class="ins"
-      data-ad-client="ca-pub-2444394876892971"
-      data-ad-slot="2068549589"
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-      :data-adtest="isDev ? 'on' : 'off'"
-      :style="{ background: isDev ? 'white' : '' }"
-    ></Adsense> -->
-
-    <!-- <advert
-      adKey="1460bb61e88e80b42f5ba58cf71ce7df"
-      :width="160"
-      :height="600"
-      class="ad-left ad-home-left"
-    /> -->
-
-    <advert
-      v-if="$store.state.windowWidth >= 1680"
-      adSlot="9162945082"
-      :width="300"
-      :height="600"
-      :viewHeight="725"
-      :viewWidth="1680"
-      class="ad-left ad-home-left ad-home-left-wide"
-    />
-
-    <advert
-      v-else
-      adSlot="2925781749"
-      :width="160"
-      :height="600"
-      :viewHeight="725"
-      :viewWidth="730"
-      class="ad-left ad-home-left"
-    />
-
-    <!-- <div class="gameads-container" @click="gameadsClicked()">
-      <div id="gameadsbanner"></div>
-    </div> -->
-
-    <a
-      class="watermark stats-link"
-      style="bottom: max(9.5vh, 3rem)"
-      href="https://kevin.games"
-      target="_blank"
-    >
-      More Games
-    </a>
-
-    <a
-      class="watermark stats-link"
-      style="bottom: max(5.5vh, 1.7rem)"
-      href="https://www.play-games.com/game/29996/scuffed-uno.html"
-      target="_blank"
-    >
-      play-games.com
-    </a>
-
-    <router-link class="watermark stats-link" to="/stats">
-      Global Stats
-    </router-link>
+    <p class="watermark stats-link">
+      This is a fork of Freddie's old Scuffed Uno to support 8 players
+    </p>
 
     <header class="header">
       <img
@@ -457,7 +369,7 @@ export default {
       >
         <p class="code" v-if="currentLevel === 'onlineRoom'">
           Room Code: <span>{{ room.id }}</span>
-          <button class="copy" @click="copyJoinRoomLink">Copy Link</button>
+          <button class="copy" @click="copyJoinRoomLink">{{ copied ? 'Copied!' : 'Copy Link' }}</button>
         </p>
 
         <u-menu-btn

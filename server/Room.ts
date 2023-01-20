@@ -781,7 +781,7 @@ export class Room {
         this.turn.botPlay(this);
       }
     } else {
-      if (this.players.length === 4) return;
+      if (this.players.length === 8) return;
 
       this.players.push(bot);
     }
