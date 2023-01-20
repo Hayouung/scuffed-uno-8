@@ -5,9 +5,6 @@ import { ChatMessage, Room, Settings } from "./Room";
 import { decrementStat, incrementPickedColors, incrementStat } from "./Stats";
 import { RateLimiter } from "limiter";
 
-import Filter from "bad-words";
-const filter = new Filter();
-
 const players: { [index: string]: Player } = {};
 const rooms: { [index: string]: Room } = {};
 const publicRooms: { host: string; code: string; maxPlayers: number; playerCount: number }[] = [];
@@ -337,7 +334,6 @@ export default function(socket: Socket) {
       return;
     }
 
-    m.text = filter.clean(m.text);
     m.time = Date.now();
 
     const room = rooms[player.roomId];
