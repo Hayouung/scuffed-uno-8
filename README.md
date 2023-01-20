@@ -2,6 +2,8 @@ This is a fork to support 8 players because sometimes more than 4 players want t
 
 Code that has been added to support 8 players is way too scuffed so don't want to make pull request...
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b899d3bb-6480-41f4-886e-0b410cf67288/deploy-status)](https://app.netlify.com/sites/scuffed-uno-8/deploys)
+
 # 🃏 [Scuffed Uno](https://scuffeduno.online) 🃏
 
 ![screenshot of scuffed uno](https://raw.githubusercontent.com/freddie-nelson/uno/main/screenshot.png)
