@@ -270,9 +270,9 @@ export default {
         const card = room.pile[room.pile.length - 1];
 
         // play card animation
-        if (room[other].count < oldRoom[other].count) {
+        if (room[other]?.count < oldRoom[other]?.count) {
           this.animateOtherPlayCard(other, card, true);
-        } else if (room[other].count > oldRoom[other].count) {
+        } else if (room[other]?.count > oldRoom[other]?.count) {
           this.animateOtherPlayCard(other, card, false);
         }
       }
