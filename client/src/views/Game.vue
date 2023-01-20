@@ -10,6 +10,8 @@ import USettingsMenu from "../components/USettingsMenu.vue";
 import Chat from "../components/Chat.vue";
 import UGamePickHand from "../components/Game/UGamePickHand.vue";
 
+let interval;
+
 export default {
   name: "Game",
   components: {
@@ -55,9 +57,13 @@ export default {
       },
       isPlayAgain: false,
       playerCardTimes: [],
+      secondsElapsed: 0,
     };
   },
   computed: {
+    time() {
+      return new Date(this.secondsElapsed * 1000).toISOString().substring(11, 19)
+    },
     room() {
       return this.$store.state.room;
     },
@@ -627,6 +633,8 @@ export default {
     if (this.isTurn) {
       this.startPlayersTurn();
     }
+
+    interval = setInterval(() => this.secondsElapsed += 1, 1000)
   },
   beforeDestroy() {
     if (!this.isPlayAgain) this.leaveRoom();
@@ -634,6 +642,7 @@ export default {
   destroyed() {
     window.onblur = null;
     window.onfocus = null;
+    clearInterval(interval)
 
     this.$store.state.socket.off("can-keep-card");
     this.$store.state.socket.off("can-bluff");
@@ -661,7 +670,8 @@ export default {
     </u-menu-modal>
 
     <div class="info-container">
-      <div class="room-code">
+      <div class="room-details">
+        <p>{{ time }}</p>
         <p>Room Code: <span class="room-code-id">{{ room.id }}</span></p>
         <button class="copy" @click="copyJoinRoomLink">{{ copied ? 'Copied!' : 'Copy Link' }}</button>
       </div>
@@ -1230,12 +1240,13 @@ $table-rotatex: 58deg;
     }
   }
 
-  .room-code {
+  .room-details {
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     font-weight: bold;
     color: rgba(255, 255, 255, 0.6);
     padding: 4px 0;
     margin-right: 8px;
+    text-align: right;
   }
 
   .room-code-id {
