@@ -46,6 +46,9 @@ import "@/api/socket";
 import Card from "@/components/Card.vue";
 import SoundController from "@/api/sound";
 
+let interval;
+let waited = 0;
+
 export default {
   components: { Card },
   name: "App",
@@ -88,13 +91,24 @@ export default {
     disconnected(val) {
       if (val) {
         if (this.$route.name !== "Home") {
-          this.$router.push({ name: "Home", query: this.$route.query });
+          if (!interval) {
+            interval = setInterval(() => waited += 1, 1000);
+          } else if (waited > 30) {
+            this.$router.push({ name: "Home", query: this.$route.query });
+            clearInterval(interval)
+            interval = undefined
+          }
         } else {
+          clearInterval(interval)
+          interval = undefined
           this.refresh = !this.refresh;
         }
 
         this.$store.state.socket.emit("leave-room");
         this.$store.commit("RESET_ROOM");
+      } else {
+        clearInterval(interval);
+        interval = undefined;
       }
     },
   },
