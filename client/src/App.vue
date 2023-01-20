@@ -89,26 +89,28 @@ export default {
       }
     },
     disconnected(val) {
+      const resetInterval = () => {
+        clearInterval(interval);
+        interval = undefined;
+        waited = 0;
+      }
+
       if (val) {
         if (this.$route.name !== "Home") {
           if (!interval) {
             interval = setInterval(() => waited += 1, 1000);
           } else if (waited > 30) {
+            resetInterval();
             this.$router.push({ name: "Home", query: this.$route.query });
-            clearInterval(interval)
-            interval = undefined
+            this.$store.state.socket.emit("leave-room");
+            this.$store.commit("RESET_ROOM");
           }
         } else {
-          clearInterval(interval)
-          interval = undefined
+          resetInterval();
           this.refresh = !this.refresh;
         }
-
-        this.$store.state.socket.emit("leave-room");
-        this.$store.commit("RESET_ROOM");
       } else {
-        clearInterval(interval);
-        interval = undefined;
+        resetInterval();
       }
     },
   },
