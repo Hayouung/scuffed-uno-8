@@ -20,6 +20,10 @@ io.on("connection", setupSocket);
 
 const port = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+  res.send('hi');
+})
+
 http.listen(port, () => {
   console.log("Server listening on port " + port);
 });
